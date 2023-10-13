@@ -15,3 +15,9 @@ export async function salesCountQuery(collection_name: string) {
 
     return await makeQuery(query);
 }
+
+export async function totalVolumeQuery(collection_name: string) {
+    const query = `SELECT SUM(listing_price) FROM ${config.DB_NAME} WHERE (collection_name == ${collection_name})`;
+
+    return await makeQuery(query);
+}

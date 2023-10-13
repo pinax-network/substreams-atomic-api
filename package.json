@@ -3,7 +3,8 @@
   "version": "v0.0.1",
   "repository": "https://github.com/pinax-network/substreams-atomicmarket-sales",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "test": "bun test src/tests/*.spec.ts --coverage"
   },
   "dependencies": {
     "@sinclair/typebox": "^0.31.17",

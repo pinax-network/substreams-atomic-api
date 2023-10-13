@@ -23,7 +23,9 @@ export function banner()  {
     Github: ${pkg.repository}
 
     HTTP GET
+        /health
         /salescount?collection_name=<string>
+        /totalvolume?collection_name=<string>
 `
     return text;
 }
