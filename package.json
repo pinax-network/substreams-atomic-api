@@ -1,0 +1,20 @@
+{
+  "description": "Atomicmarket sales API powered by Substreams",
+  "version": "v0.0.1",
+  "repository": "https://github.com/pinax-network/substreams-atomicmarket-sales",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts"
+  },
+  "dependencies": {
+    "hono": "^3.7.2"
+  },
+  "devDependencies": {
+    "bun-types": "^0.6.2"
+  },
+  "name": "substreams-atomicmarket-api",
+  "module": "index.ts",
+  "type": "module",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
