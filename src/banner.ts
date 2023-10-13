@@ -22,6 +22,8 @@ export function banner()  {
 
     Github: ${pkg.repository}
 
+    HTTP GET
+        /salescount?collection_name=<string>
 `
     return text;
 }
