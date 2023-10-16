@@ -27,7 +27,7 @@ jobs:
       - name: 'Insert mock data into Clickhouse DB for testing'
         run: |
           curl https://clickhouse.com/ | sh
-          echo "CREATE TABLE demo ( sale_id UUID, collection_name String, listing_price Float64 ) ENGINE = MergeTree ORDER BY sale_id; INSERT INTO demo (*) VALUES ('0', 'pomelo', 0.4), ('1', 'wombat', 1.57), ('2', 'pomelo', 0.2), ('3', 'pomelo', 0.8);" > setup.sql
+          echo "CREATE TABLE demo ( sale_id Uint16, collection_name String, listing_price Float64 ) ENGINE = MergeTree ORDER BY sale_id; INSERT INTO demo (*) VALUES ('0', 'pomelo', 0.4), ('1', 'wombat', 1.57), ('2', 'pomelo', 0.2), ('3', 'pomelo', 0.8);" > setup.sql
           ./clickhouse client --queries-file ./setup.sql
 
       - name: 'Run test'
