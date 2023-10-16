@@ -1,65 +1,91 @@
-import { Hono } from 'hono'
-
+import { OpenAPIHono } from '@hono/zod-openapi';
+import { serveStatic } from 'hono/bun';
+import { TypedResponse } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 
+import * as routes from './routes';
 import config from './config';
+import pkg from '../package.json';
+import * as schemas from './schemas';
 import { banner } from "./banner";
 import { salesCountQuery, totalVolumeQuery } from "./queries";
 
-const app = new Hono()
+// Export app as a function to be able to create it in tests as well.
+// Default export is different for setting Bun port/hostname than running tests.
+// See (https://hono.dev/getting-started/bun#change-port-number) vs. (https://hono.dev/getting-started/bun#_3-hello-world)
+export function generateApp() {
+    const app = new OpenAPIHono();
 
-app.get('/', (c) => c.text(banner()));
+    app.use('/swagger/*', serveStatic({ root: './' }));
 
-app.get('/health', async (c) => {
-    const start = performance.now();
-    const dbStatus = await fetch(`${config.DB_HOST}/ping`).then(async (r) => {
-        return Response.json({
-            db_status: await r.text(),
-            db_response_time_ms: performance.now() - start
-        }, r);
-    }).catch((error) => {
-        return Response.json({
-            db_status: error.code,
-            db_response_time_ms: performance.now() - start
-        }, { status: 503 });
+    app.doc('/openapi', {
+        openapi: '3.0.0',
+        info: {
+            version: pkg.version,
+            title: 'Atomicmarket Sales API',
+        },
     });
 
-    c.status(dbStatus.status);
-    return c.json(await dbStatus.json());
-});
+    app.onError((err, c) => {
+        let error_message = `${err}`;
+        let error_code = 500;
 
-app.get('/salescount', async (c) => {
-    let collection_name = c.req.query('collection_name'); 
+        if (err instanceof HTTPException){
+            error_message = err.message;
+            error_code = err.status;
+        }
 
-    if (!collection_name || typeof collection_name !== 'string')
-        throw new HTTPException(400, {
-            message: `The collection name is missing or is not valid.`
+        return c.json({ error_message }, error_code);
+    });
+
+    app.openapi(routes.indexRoute, (c) => {
+        return {
+            response: c.text(banner())
+        } as TypedResponse<string>;
+    });
+
+    app.openapi(routes.healthCheckRoute, async (c) => {
+        type DBStatusResponse = {
+            db_status: string,
+            db_response_time_ms: number
+        };
+
+        const start = performance.now();
+        const dbStatus = await fetch(`${config.dbHost}/ping`).then(async (r) => {
+            return Response.json({
+                db_status: await r.text(),
+                db_response_time_ms: performance.now() - start
+            } as DBStatusResponse, r);
+        }).catch((error) => {
+            return Response.json({
+                db_status: error.code,
+                db_response_time_ms: performance.now() - start
+            } as DBStatusResponse, { status: 503 });
         });
 
-    return c.json(await salesCountQuery(collection_name));
-});
+        c.status(dbStatus.status);
+        return {
+            response: c.json(await dbStatus.json())
+        } as TypedResponse<DBStatusResponse>;
+    });
 
-app.get('/totalvolume', async (c) => {
-    let collection_name = c.req.query('collection_name'); 
+    app.openapi(routes.salesCountQueryRoute, async (c) => {
+        const { collection_name } = c.req.valid('query') as schemas.CollectionNameSchema;
 
-    if (!collection_name || typeof collection_name !== 'string')
-        throw new HTTPException(400, {
-            message: `The collection name is missing or is not valid.`
-        });
+        return {
+            response: c.json(await salesCountQuery(collection_name))
+        } as TypedResponse<schemas.SalesCountQueryResponseSchema>;
+    });
 
-    return c.json(await totalVolumeQuery(collection_name));
-});
+    app.openapi(routes.totalVolumeQueryRoute, async (c) => {
+        const { collection_name } = c.req.valid('query') as schemas.CollectionNameSchema;
 
-app.onError((err, c) => {
-    let error_message = `${err}`;
-    let error_code = 500;
+        return {
+            response: c.json(await totalVolumeQuery(collection_name))
+        } as TypedResponse<schemas.TotalVolumeQueryResponseSchema>;
+    });
 
-    if (err instanceof HTTPException){
-        error_message = err.message;
-        error_code = err.status;
-    }
+    return app;
+}
 
-    return c.json({ message: error_message }, error_code);
-});
-
-export default app
+export default generateApp();

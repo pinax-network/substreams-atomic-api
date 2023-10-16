@@ -1,23 +1,22 @@
 {
+  "name": "substreams-atomicmarket-api",
   "description": "Atomicmarket sales API powered by Substreams",
   "version": "v0.0.1",
   "repository": "https://github.com/pinax-network/substreams-atomicmarket-sales",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
+    "lint": "bun run tsc --noEmit --skipLibCheck --pretty",
     "test": "bun test src/tests/*.spec.ts --coverage"
   },
   "dependencies": {
+    "@hono/zod-openapi": "^0.7.2",
     "@sinclair/typebox": "^0.31.17",
     "dotenv": "^16.3.1",
-    "hono": "^3.7.2"
+    "hono": "^3.7.2",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "bun-types": "^0.6.2"
-  },
-  "name": "substreams-atomicmarket-api",
-  "module": "index.ts",
-  "type": "module",
-  "peerDependencies": {
-    "typescript": "^5.0.0"
+    "bun-types": "^0.6.2",
+    "typescript": "^5.2.2"
   }
 }

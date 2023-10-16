@@ -1,84 +1,47 @@
 import { describe, expect, it, beforeAll } from 'bun:test';
+import { ZodError } from 'zod';
 
-import app from '../index';
 import config from '../config';
 import { banner } from "../banner";
+import { generateApp }  from '../index';
+import { salesCountQuery, totalVolumeQuery } from '../queries';
+import {SalesCountQueryResponseSchema ,TotalVolumeQueryResponseSchema } from '../schemas';
 
-const dbIsUp = (await fetch(`${config.DB_HOST}/ping`).catch((error) => {}))?.status == 200;
+const app = generateApp();
+
+const dbIsUp = (await fetch(`${config.dbHost}/ping`).catch((error) => {}))?.status == 200;
 console.info(`Database is ${dbIsUp ? '' : 'not '}running !`);
 
 describe('Sales count query page (/salescount?collection_name=<string>)', () => {
-    it('Should fail on missing collection name parameter', async () => {
-        const res = await app.request('/salescount');
-        expect(res.status).toBe(400);
+    let valid_collection_name: string;
 
-        const json = await res.json();
-        expect(json.message).toContain('missing');
+    beforeAll(() => {
+        valid_collection_name = 'pomelo';
     });
 
-    /* maybe not needed
-       see here: https://discord.com/channels/844473918685052973/1161988844493746266/1162402898781667380
-    it('Should fail on non-valid collection name parameter', async () => {
-        let collection_name = 123;
-        const res = await app.request(`/totalvolume?collection_name=${collection_name}`);
-        expect(res.status).toBe(500);
-
-        const json = await res.json();
-        expect(json.message).toContain('Invalid');
-    });*/
-
-    it.skipIf(dbIsUp)('Should fail on database connection error', async () => {
-        const res = await app.request('/salescount?collection_name=pomelo');
-        expect(res.status).toBe(500);
-
-        const json = await res.json();
-        expect(json.message).toContain('ConnectionRefused');
-    });
-
-    it.if(dbIsUp)('Should return 200 Response on valid input', async () => {
-        const collection_name = 'pomelo';
+    it.each(['', -1])('Should fail on missing or invalid collection name parameter: collection_name=%s', async (collection_name: string) => {
         const res = await app.request(`/salescount?collection_name=${collection_name}`);
-        expect(res.status).toBe(200);
-
-        const json = await res.json();
-        expect(json).toHaveProperty('data');
-    });
-});
-
-describe('Total volume query page (/totalvolume?collection_name=<string>)', () => {
-    it('Should fail on missing collection name parameter', async () => {
-        const res = await app.request('/totalvolume');
         expect(res.status).toBe(400);
 
         const json = await res.json();
-        expect(json.message).toContain('missing');
+        expect(json.success).toBe(false);
+        expect(['invalid_union', 'too_small']).toContain(json.error.issues[0].code);
     });
 
-     /* maybe not needed
-       see here: https://discord.com/channels/844473918685052973/1161988844493746266/1162402898781667380
-    it('Should fail on non-valid collection name parameter', async () => {
-        let collection_name = 123;
-        const res = await app.request(`/totalvolume?collection_name=${collection_name}`);
-        expect(res.status).toBe(500);
+    it(`Should not allow more than the maximum number of elements to be queried (${config.maxElementsQueried})`, async () => {
+        const res = await app.request(`/sales_count?block_number=${Array(config.maxElementsQueried + 1).fill(valid_collection_name).toString()}`);
+        expect(res.status).toBe(400);
 
         const json = await res.json();
-        expect(json.message).toContain('Invalid');
-    });*/
-
-    it.skipIf(dbIsUp)('Should fail on database connection error', async () => {
-        const res = await app.request('/totalvolume?collection_name=pomelo');
-        expect(res.status).toBe(500);
-
-        const json = await res.json();
-        expect(json.message).toContain('ConnectionRefused');
+        expect(json.success).toBe(false);
+        expect(json.error.issues[0].code).toBe('too_big');
     });
 
-    it.if(dbIsUp)('Should return 200 Response on valid input', async () => {
-        const collection_name = 'pomelo';
-        const res = await app.request(`/totalvolume?collection_name=${collection_name}`);
+    it('Should return (200) empty JSON on valid input', async () => {
+        const res = await app.request(`/salescount?collection_name=${valid_collection_name}`);
         expect(res.status).toBe(200);
 
         const json = await res.json();
-        expect(json).toHaveProperty('data');
+        expect(json).toHaveLength(0);
     });
 });

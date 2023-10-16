@@ -24,6 +24,8 @@ export function banner()  {
 
     HTTP GET
         /health
+        /openapi
+        /swagger
         /salescount?collection_name=<string>
         /totalvolume?collection_name=<string>
 `
