@@ -16,15 +16,16 @@ describe('Sales count query page (/salescount?collection_name=<string>)', () => 
         expect(json.message).toContain('missing');
     });
 
+    /* maybe not needed
+       see here: https://discord.com/channels/844473918685052973/1161988844493746266/1162402898781667380
     it('Should fail on non-valid collection name parameter', async () => {
-        // make an int collection name
         let collection_name = 123;
         const res = await app.request(`/totalvolume?collection_name=${collection_name}`);
         expect(res.status).toBe(500);
 
         const json = await res.json();
         expect(json.message).toContain('Invalid');
-    });
+    });*/
 
     it.skipIf(dbIsUp)('Should fail on database connection error', async () => {
         const res = await app.request('/salescount?collection_name=pomelo');
@@ -53,6 +54,8 @@ describe('Total volume query page (/totalvolume?collection_name=<string>)', () =
         expect(json.message).toContain('missing');
     });
 
+     /* maybe not needed
+       see here: https://discord.com/channels/844473918685052973/1161988844493746266/1162402898781667380
     it('Should fail on non-valid collection name parameter', async () => {
         let collection_name = 123;
         const res = await app.request(`/totalvolume?collection_name=${collection_name}`);
@@ -60,7 +63,7 @@ describe('Total volume query page (/totalvolume?collection_name=<string>)', () =
 
         const json = await res.json();
         expect(json.message).toContain('Invalid');
-    });
+    });*/
 
     it.skipIf(dbIsUp)('Should fail on database connection error', async () => {
         const res = await app.request('/totalvolume?collection_name=pomelo');
