@@ -9,9 +9,6 @@ import {SalesCountQueryResponseSchema ,TotalVolumeQueryResponseSchema } from '..
 
 const app = generateApp();
 
-const dbIsUp = (await fetch(`${config.dbHost}/ping`).catch((error) => {}))?.status == 200;
-console.info(`Database is ${dbIsUp ? '' : 'not '}running !`);
-
 describe('Sales count query page (/salescount?collection_name=<string>)', () => {
     let valid_collection_name: string;
 
