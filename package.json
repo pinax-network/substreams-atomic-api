@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "lint": "bun run tsc --noEmit --skipLibCheck --pretty",
-    "test": "bun test src/tests/*.spec.ts --coverage"
+    "test": "bun test src/tests/*.spec.ts --coverage",
+    "build": "bun build --compile ./src/index.ts --outfile substreams-atomicmarket-api"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.7.2",
