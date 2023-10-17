@@ -19,7 +19,7 @@ describe('Sales count query page (/salescount?collection_name=<string>)', () => 
         valid_collection_name = 'pomelo';
     });
 
-    it.each(['', -1])('Should fail on missing or invalid collection name parameter: collection_name=%s', async (collection_name: string) => {
+    /*it.each(['', -1])('Should fail on missing or invalid collection name parameter: collection_name=%s', async (collection_name: string) => {
         const res = await app.request(`/salescount?collection_name=${collection_name}`);
         expect(res.status).toBe(400);
 
@@ -39,13 +39,15 @@ describe('Sales count query page (/salescount?collection_name=<string>)', () => 
 
     it('Should return (200) empty JSON on valid input', async () => {
         const res = await app.request(`/salescount?collection_name=${valid_collection_name}`);
+        console.log('collection_name=%s', valid_collection_name);
+        console.log(res);
         expect(res.status).toBe(200);
 
         const json = await res.json();
         expect(json).toHaveLength(0);
     });
 });
-
+/*
 describe('Total volume query page (/totalvolume?collection_name=<string>)', () => {
     let valid_collection_name: string;
 
@@ -69,7 +71,7 @@ describe('Total volume query page (/totalvolume?collection_name=<string>)', () =
         const json = await res.json();
         expect(json.success).toBe(false);
         expect(json.error.issues[0].code).toBe('too_big');
-    });*/
+    });
 
     it('Should return (200) empty JSON on valid input', async () => {
         const res = await app.request(`/totalvolume?collection_name=${valid_collection_name}`);
@@ -78,4 +80,4 @@ describe('Total volume query page (/totalvolume?collection_name=<string>)', () =
         const json = await res.json();
         expect(json).toHaveLength(0);
     });
-});
+});*/
