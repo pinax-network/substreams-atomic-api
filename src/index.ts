@@ -88,4 +88,9 @@ export function generateApp() {
     return app;
 }
 
-export default generateApp();
+Bun.serve({
+    port: config.port,
+    hostname: config.hostname,
+    fetch: generateApp().fetch
+}
+)
