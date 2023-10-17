@@ -92,5 +92,4 @@ Bun.serve({
     port: config.port,
     hostname: config.hostname,
     fetch: generateApp().fetch
-}
-)
+})

@@ -2,12 +2,12 @@ import { z } from '@hono/zod-openapi';
 import { HTTPException } from 'hono/http-exception';
 
 import config from './config'
-import { CollectionNameSchema, SalesCountQueryResponseSchema, TotalVolumeQueryResponseSchema } from './schemas';
+import { SalesCountQueryResponseSchema, TotalVolumeQueryResponseSchema } from './schemas';
 
 // Describe the default returned data format `JSONObjectEachRow` from the Clickhouse DB
 type JSONObjectEachRow = {
     [key: string]: {
-        [key: string]: Array<string>
+        [key: string]: string
     }
 };
 
@@ -36,18 +36,23 @@ async function makeQuery(query: string, format: string = 'JSONObjectEachRow'): P
     return json;
 }
 
- //@TODO keep updating queries
 
-export async function salesCountQuery(collection_name: string) {
-    const query = `SELECT COUNT(sale_id) FROM ${config.name} WHERE (collection_name == ${collection_name})`;
+export async function salesCountQuery(collection_name: string): Promise<SalesCountQueryResponseSchema> {
+    const query = `SELECT COUNT(sale_id) FROM ${config.name} WHERE (collection_name == '${collection_name}')`;
     const json = await makeQuery(query);
 
-    return SalesCountQueryResponseSchema.parse(json);
+    return SalesCountQueryResponseSchema.parse({
+        collection_name: collection_name,
+        sales_count: Object.values(json as JSONObjectEachRow)[0]["count(sale_id)"]
+    });
 }
 
 export async function totalVolumeQuery(collection_name: string) {
-    const query = `SELECT SUM(listing_price) FROM ${config.name} WHERE (collection_name == ${collection_name})`;
+    const query = `SELECT SUM(listing_price) FROM ${config.name} WHERE (collection_name == '${collection_name}')`;
     const json = await makeQuery(query);
 
-    return TotalVolumeQueryResponseSchema.parse(json);
+    return TotalVolumeQueryResponseSchema.parse({
+        collection_name: collection_name,
+        total_volume: Object.values(json as JSONObjectEachRow)[0]["sum(listing_price)"]
+    });
 }
