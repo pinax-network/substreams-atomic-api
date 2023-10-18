@@ -1,8 +1,8 @@
 {
   "name": "substreams-atomicmarket-api",
   "description": "Atomicmarket sales API powered by Substreams",
-  "version": "v0.0.1",
-  "repository": "https://github.com/pinax-network/substreams-atomicmarket-sales",
+  "version": "v0.1.0",
+  "repository": "https://github.com/pinax-network/substreams-atomicmarket-api",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "lint": "bun run tsc --noEmit --skipLibCheck --pretty",
