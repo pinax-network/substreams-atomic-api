@@ -1,4 +1,5 @@
 # [`Substreams`](https://substreams.streamingfast.io/) Atomicmarket API
+[![.github/workflows/bun-test.yml](https://github.com/pinax-network/substreams-atomicmarket-api/actions/workflows/bun-test.yml/badge.svg)](https://github.com/pinax-network/substreams-atomicmarket-api/actions/workflows/bun-test.yml)
 
 ## REST API
 
@@ -26,6 +27,14 @@ $ bun dev
 ```
 open http://localhost:3001
 ```
+## [`Bun` Binary Releases](https://github.com/pinax-network/substreams-sink-websockets/releases)
+
+> Linux Only
+
+```console
+$ wget https://github.com/pinax-network/substreams-atomicmarket-api/releases/download/v0.1.0/substreams-atomicmarket-api
+$ chmod +x ./substreams-atomicmarket-api
+```
 
 ## `.env` Environment variables
 
@@ -38,4 +47,19 @@ DB_NAME=demo
 DB_USERNAME=default
 DB_PASSWORD=
 ```
+## Docker environment
 
+Pull from GitHub Container registry
+```bash
+docker pull ghcr.io/pinax-network/substreams-atomicmarket-api:latest
+```
+
+Build from source
+```bash
+docker build -t substreams-atomicmarket-api .
+```
+
+Run with `.env` file
+```bash
+docker run -it --rm --env-file .env ghcr.io/pinax-network/substreams-atomicmarket-api
+```
