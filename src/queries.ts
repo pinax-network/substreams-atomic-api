@@ -40,19 +40,35 @@ async function makeQuery(query: string, format: string = 'JSONObjectEachRow'): P
 export async function salesCountQuery(collection_name: string): Promise<SalesCountQueryResponseSchema> {
     const query = `SELECT COUNT(sale_id) FROM ${config.name} WHERE (collection_name == '${collection_name}')`;
     const json = await makeQuery(query);
-
-    return SalesCountQueryResponseSchema.parse({
-        collection_name: collection_name,
-        sales_count: Object.values(json as JSONObjectEachRow)[0]["count(sale_id)"]
-    });
+    
+    let responseSchema;
+    try {
+        responseSchema = SalesCountQueryResponseSchema.parse({
+            collection_name: collection_name,
+            sales_count: Object.values(json as JSONObjectEachRow)[0]["count(sale_id)"]
+        })
+    } catch {
+        throw new HTTPException(500, {
+            message: `Collection invalid, sales_count received : ${Object.values(json as JSONObjectEachRow)[0]["count(sale_id)"]} `
+        });
+        }
+    return responseSchema;
 }
 
 export async function totalVolumeQuery(collection_name: string) {
     const query = `SELECT SUM(listing_price) FROM ${config.name} WHERE (collection_name == '${collection_name}')`;
     const json = await makeQuery(query);
 
-    return TotalVolumeQueryResponseSchema.parse({
-        collection_name: collection_name,
-        total_volume: Object.values(json as JSONObjectEachRow)[0]["sum(listing_price)"]
-    });
+    let responseSchema;
+    try {
+        responseSchema = TotalVolumeQueryResponseSchema.parse({
+            collection_name: collection_name,
+            total_volume: Object.values(json as JSONObjectEachRow)[0]["sum(listing_price)"]
+        })
+    } catch {
+        throw new HTTPException(500, {
+            message: `Collection invalid, total_volume received : ${Object.values(json as JSONObjectEachRow)[0]["sum(listing_price)"]} `
+        });
+        }
+    return responseSchema;
 }
