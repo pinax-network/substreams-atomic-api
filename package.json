@@ -1,23 +1,31 @@
 {
   "name": "substreams-atomicmarket-api",
   "description": "Atomicmarket sales API powered by Substreams",
-  "version": "v0.1.0",
-  "repository": "https://github.com/pinax-network/substreams-atomicmarket-api",
+  "version": "v0.2.0",
+  "homepage": "https://github.com/pinax-network/substreams-atomicmarket-api",
+  "author": {
+    "name": "Paul Meignan",
+    "email": "paulm@pinax.network",
+    "url": "https://github.com/Pelotfr"
+  },
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
-    "lint": "bun run tsc --noEmit --skipLibCheck --pretty",
-    "test": "bun test src/tests/*.spec.ts --coverage",
-    "build": "bun build --compile ./src/index.ts --outfile substreams-atomicmarket-api"
+    "start": "bun index.ts",
+    "dev": "bun --watch index.ts",
+    "pretest": "bunx tsc --noEmit --skipLibCheck --pretty",
+    "test": "bun test --coverage",
+    "build": "bun build --compile ./index.ts --outfile substreams-atomicmarket-api"
   },
   "dependencies": {
-    "@hono/zod-openapi": "^0.7.2",
-    "@sinclair/typebox": "^0.31.17",
-    "dotenv": "^16.3.1",
-    "hono": "^3.7.2",
-    "zod": "^3.22.4"
+    "@clickhouse/client-web": "latest",
+    "commander": "latest",
+    "dotenv": "latest",
+    "openapi3-ts": "latest",
+    "prom-client": "latest",
+    "tslog": "latest",
+    "zod": "latest"
   },
   "devDependencies": {
-    "bun-types": "^0.6.2",
-    "typescript": "^5.2.2"
+    "bun-types": "latest",
+    "typescript": "latest"
   }
 }

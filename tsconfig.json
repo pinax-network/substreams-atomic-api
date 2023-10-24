@@ -28,6 +28,7 @@
     "allowSyntheticDefaultImports": true
   },
   "include": [
+    "index.ts",
     "src/**/*.ts",
     "package.json"
   ],

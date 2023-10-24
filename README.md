@@ -5,16 +5,15 @@
 
 | Pathname                                  | Description           |
 |-------------------------------------------|-----------------------|
-| GET `/`                                   | Banner
 | GET `/health`                             | Health check
+| GET `/salescount`        | Number of sales for a collection
+| GET `/totalvolume`       | Volume of sales  for a collection
+| GET `/metrics`                            | Prometheus metrics
 | GET `/openapi`                            | [OpenAPI v3 JSON](https://spec.openapis.org/oas/v3.0.0)
-| GET `/swagger`                            | [Swagger UI](https://swagger.io/resources/open-api/)
-| GET `/salescount?collection_name=`        | Number of sales query for a collection
-| GET `/totalvolume?collection_name=`       | Volume of sales query for a collection
 
 ## Requirements
 
-- [Clickhouse](clickhouse.com/)
+- [Clickhouse](https://clickhouse.com/)
 
 Additionnaly to pull data directly from a substream:
 - [Substreams Sink Clickhouse](https://github.com/pinax-network/substreams-sink-clickhouse/)
@@ -32,20 +31,27 @@ open http://localhost:3001
 > Linux Only
 
 ```console
-$ wget https://github.com/pinax-network/substreams-atomicmarket-api/releases/download/v0.1.0/substreams-atomicmarket-api
+$ wget https://github.com/pinax-network/substreams-atomicmarket-api/releases/download/v0.2.0/substreams-atomicmarket-api
 $ chmod +x ./substreams-atomicmarket-api
 ```
 
 ## `.env` Environment variables
 
 ```env
-# Optional
+# API Server
 PORT=3001
 HOSTNAME=localhost
-DB_HOST=http://localhost:8123
-DB_NAME=demo
-DB_USERNAME=default
-DB_PASSWORD=
+
+# Clickhouse Database
+HOST=http://127.0.0.1:8123
+DATABASE=default
+USERNAME=default
+PASSWORD=
+TABLE=demo
+MAX_LIMIT=500
+
+# Logging
+VERBOSE=true
 ```
 ## Docker environment
 
