@@ -1,42 +1,14 @@
-name: Test
+name: Bun Test
 
-on:
-  push:
-    branches: [ develop* ]
-  pull_request:
-    branches: [ develop*,main ]
+on: push
 
 jobs:
-  bun-test:
+  build-and-test:
     runs-on: ubuntu-latest
-    environment: dev-test
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Install bun
-        uses: oven-sh/setup-bun@v1
-
-      - name: 'Install Dependencies'
-        run: |
-          bun install
-
-      - name: 'Setup local Clickhouse DB'
-        uses: metrico/clickhouse-server-action@v1.0.0
-
-      - name: 'Insert mock data into Clickhouse DB for testing'
-        run: |
-          curl https://clickhouse.com/ | sh
-          echo "CREATE TABLE demo ( sale_id UInt16, collection_name String, listing_price Float64 ) ENGINE = MergeTree ORDER BY sale_id; INSERT INTO demo (*) VALUES ('0', 'pomelo', 0.4), ('1', 'wombat', 1.57), ('2', 'pomelo', 0.2), ('3', 'pomelo', 0.8);" > setup.sql
-          ./clickhouse client --queries-file ./setup.sql
-
-      - name: 'Run test'
-        run: |
-          bun test
-        env:
-          HOSTNAME: ${{ vars.HOSTNAME }}
-          PORT: ${{ vars.PORT }}
-          DB_HOST: ${{ vars.DB_HOST }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USERNAME: ${{ secrets.USERNAME }}
-          DB_PASSWORD: ''
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun run test
