@@ -5,12 +5,14 @@ import salescount from "./salescount.js";
 import totalvolume from "./totalvolume.js";
 import * as prometheus from "../prometheus.js";
 import { logger } from "../logger.js";
+import swaggerHtml from "../../swagger/index.html"
+import swaggerFavicon from "../../swagger/favicon.png"
 
 export default async function (req: Request) {
     const { pathname} = new URL(req.url);
     prometheus.request.inc({pathname});
-    if ( pathname === "/" ) return new Response(Bun.file("./swagger/index.html"));
-    if ( pathname === "/favicon.png" ) return new Response(Bun.file("./swagger/favicon.png"));
+    if ( pathname === "/" ) return new Response(Bun.file(swaggerHtml));
+    if ( pathname === "/favicon.png" ) return new Response(Bun.file(swaggerFavicon));
     if ( pathname === "/health" ) return health(req);
     if ( pathname === "/metrics" ) return new Response(await registry.metrics(), {headers: {"Content-Type": registry.contentType}});
     if ( pathname === "/openapi" ) return new Response(openapi, {headers: {"Content-Type": "application/json"}});
