@@ -3,6 +3,7 @@
   "description": "Atomicmarket sales API powered by Substreams",
   "version": "v0.2.0",
   "homepage": "https://github.com/pinax-network/substreams-atomicmarket-api",
+  "type": "module",
   "author": {
     "name": "Paul Meignan",
     "email": "paulm@pinax.network",

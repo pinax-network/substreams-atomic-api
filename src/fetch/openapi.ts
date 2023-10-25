@@ -1,9 +1,9 @@
 import pkg from "../../package.json" assert { type: "json" };
 
 import { OpenApiBuilder, SchemaObject, ExampleObject, ParameterObject } from "openapi3-ts/oas31";
-import { config } from "../config";
-import { registry } from "../prometheus";
-import { makeQuery } from "../clickhouse/makeQuery";
+import { config } from "../config.js";
+import { registry } from "../prometheus.js";
+import { makeQuery } from "../clickhouse/makeQuery.js";
 
 const TAGS = {
   MONITORING: "Monitoring",

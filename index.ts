@@ -1,6 +1,6 @@
-import { config } from "./src/config";
-import { logger } from "./src/logger";
-import GET from "./src/fetch/GET";
+import { config } from "./src/config.js";
+import { logger } from "./src/logger.js";
+import GET from "./src/fetch/GET.js";
 import * as prometheus from "./src/prometheus.js";
 
 if (config.verbose) logger.enable();
