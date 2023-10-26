@@ -6,9 +6,9 @@ export interface Meta {
     name: string,
     type: string
 }
-export interface Query {
+export interface Query<T> {
     meta: Meta[],
-    data: string,
+    data: T[],
     rows: number,
     statistics: {
         elapsed: number,
@@ -17,9 +17,9 @@ export interface Query {
     }
 }
 
-export async function makeQuery(query: string) {
+export async function makeQuery<T = unknown>(query: string) {
     const response = await client.query({ query })
-    const data: Query = await response.json();
+    const data: Query<T> = await response.json();
     prometheus.query.inc();
     prometheus.bytes_read.inc(data.statistics.bytes_read);
     prometheus.rows_read.inc(data.statistics.rows_read);
