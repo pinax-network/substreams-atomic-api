@@ -1,6 +1,6 @@
 {
   "name": "substreams-atomicmarket-api",
-  "description": "Atomicmarket sales API powered by Substreams",
+  "description": "Atomicmarket sales API",
   "version": "v0.2.0",
   "homepage": "https://github.com/pinax-network/substreams-atomicmarket-api",
   "type": "module",
