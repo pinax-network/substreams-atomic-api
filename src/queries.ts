@@ -15,7 +15,10 @@ export interface Sale {
 export function getSale(searchParams: URLSearchParams) {
     // SQL Query
     let query = `SELECT * FROM Sales`;
+
+    // JOIN block table
     const where = [];
+    query += ` JOIN blocks ON blocks.block_id = Sales.block_id`;
 
     // Clickhouse Operators
     // https://clickhouse.com/docs/en/sql-reference/operators
@@ -46,7 +49,6 @@ export function getSale(searchParams: URLSearchParams) {
     const listing_price_amount = searchParams.get('listing_price_amount');
     const listing_price_symcode = searchParams.get('listing_price_symcode');
     const trx_id = searchParams.get('trx_id');
-    const asset_ids = searchParams.get('asset_ids'); 
     if (collection_name) where.push(`collection_name == '${collection_name}'`);
     if (sale_id) where.push(`sale_id == '${sale_id}'`);
     if (block_number) where.push(`block_number == '${block_number}'`);
@@ -54,7 +56,6 @@ export function getSale(searchParams: URLSearchParams) {
     if (listing_price_amount) where.push(`listing_price_amount == ${listing_price_amount}`);
     if (listing_price_symcode) where.push(`listing_price_symcode == '${listing_price_symcode}'`);
     if (trx_id) where.push(`trx_id == '${trx_id}'`);
-    if (asset_ids) where.push(`asset_ids == '${asset_ids}'`);
 
     // Join WHERE statements with AND
     if ( where.length ) query += ` WHERE (${where.join(' AND ')})`;

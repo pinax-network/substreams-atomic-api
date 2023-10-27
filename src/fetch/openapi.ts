@@ -59,7 +59,7 @@ export default new OpenApiBuilder()
     get: {
       tags: [TAGS.USAGE],
       summary: "Get sales",
-      description: "Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `asset_ids`",
+      description: "Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `asset_id_in_asset_ids`",
       parameters: [
         {
           name: "collection_name",
@@ -110,13 +110,6 @@ export default new OpenApiBuilder()
           in: "query",
           required: false,
           schema: { type: "string" },
-        },
-        {
-          name: "asset_ids",
-          description: "Filter by exact list of asset IDs in the sale (ex: [2199023842153])",
-          in: "query",
-          required: false,
-          schema: { type: "string", },
         },
         {
           name: "asset_id_in_asset_ids",
