@@ -12,7 +12,7 @@ export default async function (req: Request) {
     return new Response(JSON.stringify(response.data), { headers: { "Content-Type": "application/json" } });
   } catch (e: any) {
     logger.error(e);
-    prometheus.request_error.inc({pathname: "/sale", status: 400});
+    prometheus.request_error.inc({pathname: "/sales", status: 400});
     return new Response(e.message, { status: 400 });
   }
 }

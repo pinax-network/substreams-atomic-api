@@ -16,4 +16,10 @@ test("getSale", () => {
 
     expect(getSale(new URLSearchParams({collection_name, greater_or_equals_by_listing_price_amount: '15', limit: '10'})))
         .toBe(`SELECT * FROM Sales WHERE (listing_price_amount >= 15 AND collection_name == '${collection_name}') ORDER BY sale_id DESC LIMIT 10`);
+
+    expect(getSale(new URLSearchParams({asset_id_in_asset_ids: '2199024044581'})))
+    .toBe(`SELECT * FROM Sales WHERE (has(asset_ids, 2199024044581)) ORDER BY sale_id DESC LIMIT 1`);
+
+    expect(getSale(new URLSearchParams({asset_ids: '[2199024044581]'})))
+    .toBe(`SELECT * FROM Sales WHERE (asset_ids == '[2199024044581]') ORDER BY sale_id DESC LIMIT 1`);
 });

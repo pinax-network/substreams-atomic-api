@@ -113,10 +113,17 @@ export default new OpenApiBuilder()
         },
         {
           name: "asset_ids",
-          description: "Filter by asset IDs in the sale (ex: [2199023842153])",
+          description: "Filter by exact list of asset IDs in the sale (ex: [2199023842153])",
           in: "query",
           required: false,
-          schema: { type: "array", items: { type: "number" } },
+          schema: { type: "string", },
+        },
+        {
+          name: "asset_id_in_asset_ids",
+          description: "Filter by asset ID in list of asset IDs in the sale (ex: 2199023842153)",
+          in: "query",
+          required: false,
+          schema: { type: "number" },
         },
         {
           name: "sort_by",

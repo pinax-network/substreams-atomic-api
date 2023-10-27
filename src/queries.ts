@@ -34,6 +34,10 @@ export function getSale(searchParams: URLSearchParams) {
         if (listing_price_amount) where.push(`listing_price_amount ${operator} ${listing_price_amount}`);
     }
 
+    // contains asset_id
+    const asset_id_in_asset_ids = searchParams.get("asset_id_in_asset_ids");
+    if (asset_id_in_asset_ids) where.push(`has(asset_ids, ${asset_id_in_asset_ids})`)
+
     // equals
     const collection_name = searchParams.get("collection_name");
     const sale_id = searchParams.get("sale_id");
@@ -42,7 +46,7 @@ export function getSale(searchParams: URLSearchParams) {
     const listing_price_amount = searchParams.get('listing_price_amount');
     const listing_price_symcode = searchParams.get('listing_price_symcode');
     const trx_id = searchParams.get('trx_id');
-    const asset_ids = searchParams.get('asset_ids');
+    const asset_ids = searchParams.get('asset_ids'); 
     if (collection_name) where.push(`collection_name == '${collection_name}'`);
     if (sale_id) where.push(`sale_id == '${sale_id}'`);
     if (block_number) where.push(`block_number == '${block_number}'`);
