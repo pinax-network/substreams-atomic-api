@@ -14,12 +14,18 @@ export interface Sale {
 
 export function getSale(searchParams: URLSearchParams) {
     // SQL Query
-    let query = `SELECT * FROM Sales`;
+    let query = `SELECT sale_id, trx_id, asset_ids, listing_price_amount, listing_price_precision, listing_price_symcode,
+s.collection_name as collection_name, template_id, block_number, timestamp FROM`;
+    
+    // explode asset_ids array (useful for bundle sales)
+    query += ` (SELECT * FROM Sales ARRAY JOIN asset_ids) AS s`;
+    // JOIN assets table where Assets.asset_id is in Sales.asset_ids
+    query += `\nJOIN Assets AS a ON a.asset_id = s.asset_ids AND a.collection_name = s.collection_name`;
 
     // JOIN block table
-    const where = [];
-    query += ` JOIN blocks ON blocks.block_id = Sales.block_id`;
+    query += `\nJOIN blocks ON blocks.block_id = s.block_id`;
 
+    const where = [];
     // Clickhouse Operators
     // https://clickhouse.com/docs/en/sql-reference/operators
     const operators = [
@@ -49,6 +55,7 @@ export function getSale(searchParams: URLSearchParams) {
     const listing_price_amount = searchParams.get('listing_price_amount');
     const listing_price_symcode = searchParams.get('listing_price_symcode');
     const trx_id = searchParams.get('trx_id');
+    const template_id = searchParams.get('template_id');
     if (collection_name) where.push(`collection_name == '${collection_name}'`);
     if (sale_id) where.push(`sale_id == '${sale_id}'`);
     if (block_number) where.push(`block_number == '${block_number}'`);
@@ -56,6 +63,7 @@ export function getSale(searchParams: URLSearchParams) {
     if (listing_price_amount) where.push(`listing_price_amount == ${listing_price_amount}`);
     if (listing_price_symcode) where.push(`listing_price_symcode == '${listing_price_symcode}'`);
     if (trx_id) where.push(`trx_id == '${trx_id}'`);
+    if (template_id) where.push(`template_id == '${template_id}'`);
 
     // Join WHERE statements with AND
     if ( where.length ) query += ` WHERE (${where.join(' AND ')})`;

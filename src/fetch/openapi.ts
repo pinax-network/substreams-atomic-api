@@ -59,7 +59,7 @@ export default new OpenApiBuilder()
     get: {
       tags: [TAGS.USAGE],
       summary: "Get sales",
-      description: "Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `asset_id_in_asset_ids`",
+      description: "Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `asset_id_in_asset_ids`",
       parameters: [
         {
           name: "collection_name",
@@ -76,6 +76,14 @@ export default new OpenApiBuilder()
           schema: { type: "number" },
         },
         {
+          name: 'timestamp',
+          in: 'query',
+          description: 'Filter by exact timestamp',
+          required: false,
+          schema: timestampSchema,
+          examples: timestampExamples,
+        },
+        {
           name: "block_number",
           description: "Filter by Block number (ex: 18399498)",
           in: "query",
@@ -83,12 +91,11 @@ export default new OpenApiBuilder()
           schema: { type: "number" },
         },
         {
-          name: 'timestamp',
-          in: 'query',
-          description: 'Filter by exact timestamp',
+          name: "template_id",
+          description: "Filter by Asset Template ID  (ex: 10620)",
+          in: "query",
           required: false,
-          schema: timestampSchema,
-          examples: timestampExamples,
+          schema: { type: "number" },
         },
         {
           name: "listing_price_amount",
