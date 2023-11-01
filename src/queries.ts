@@ -81,14 +81,28 @@ export function getAggregate(searchParams: URLSearchParams) {
     let query = `SELECT`;
 
     // Aggregate Function
+    const valid_agg_functions = ["min", "max", "avg", "sum", "count", "median"];
     const aggregate_function = searchParams.get("aggregate_function");
-    const aggregate_column = searchParams.get("aggregate_column");
-    if (aggregate_function == "count" && !aggregate_column) query += ` count()`;
-    else if (aggregate_function && aggregate_column) query += ` ${aggregate_function}(${aggregate_column})`;
-    else throw new Error("Invalid aggregate function or column");
+    if(!aggregate_function) throw new Error("Aggregate function is required");
+    if (aggregate_function && !valid_agg_functions.includes(aggregate_function)) throw new Error("Aggregate function not supported");
 
+    // Aggregate Column
+    const valid_agg_columns = ["sale_id", "asset_ids", "listing_price_amount", "listing_price_value"];
+    const aggregate_column = searchParams.get("aggregate_column");
+    if (aggregate_column && !valid_agg_columns.includes(aggregate_column)) throw new Error("Aggregate column not supported");
+
+    if (aggregate_function == "count") {
+        if (aggregate_column) query += ` count(${aggregate_column})`;
+        else query += ` count()`;
+    }
+    else if (aggregate_column != "sale_id" && aggregate_column != "asset_ids") query += ` ${aggregate_function}(${aggregate_column})`
+    else throw new Error("Invalid aggregate column with given aggregate function");
 
     query += ` FROM Sales`;
+
+    // JOIN block table
+    query += ` JOIN blocks ON blocks.block_id = Sales.block_id`;
+
     const where = [];
     // Clickhouse Operators
     // https://clickhouse.com/docs/en/sql-reference/operators

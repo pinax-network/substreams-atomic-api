@@ -4,8 +4,6 @@ import { expect, test } from "bun:test";
 import { getSale, getAggregate } from "./queries.js";
 
 const collection_name = "pomelo";
-const aggregate_function = "min";
-const aggregate_column = "listing_price_amount";
 
 test("getSale", () => {
     expect(getSale(new URLSearchParams({collection_name})))
@@ -22,6 +20,12 @@ JOIN blocks ON blocks.block_id = s.block_id WHERE (collection_name == '${collect
 });
 
 test("getAggregate", () => {
-    expect(getAggregate(new URLSearchParams({aggregate_function, aggregate_column})))
-        .toBe(`SELECT ${aggregate_function}(${aggregate_column}) FROM Sales`);
+    expect(getAggregate(new URLSearchParams({aggregate_function: 'count', collection_name})))
+        .toBe(`SELECT count() FROM Sales WHERE (collection_name == '${collection_name}')`);
+
+    expect(getAggregate(new URLSearchParams({aggregate_function: 'count', aggregate_column: 'sale_id'})))
+        .toBe(`SELECT count(sale_id) FROM Sales`);
+        
+    expect(getAggregate(new URLSearchParams({aggregate_function: 'max', aggregate_column: 'listing_price_amount'})))
+        .toBe(`SELECT max(listing_price_amount) FROM Sales`);
 });
