@@ -2,7 +2,7 @@ import pkg from "../../package.json" assert { type: "json" };
 
 import { OpenApiBuilder, SchemaObject, ExampleObject, ParameterObject } from "openapi3-ts/oas31";
 import { config } from "../config.js";
-import { getSale } from "../queries.js";
+import { getSale, getAggregate } from "../queries.js";
 import { registry } from "../prometheus.js";
 import { makeQuery } from "../clickhouse/makeQuery.js";
 
@@ -14,6 +14,7 @@ const TAGS = {
 } as const;
 
 const sale_example = (await makeQuery(await getSale( new URLSearchParams({limit: "2"})))).data;
+const aggregate_example = (await makeQuery(await getAggregate( new URLSearchParams({aggregate_function: "count"})))).data;
 
 const timestampSchema: SchemaObject = { anyOf: [
   {type: "number"},
@@ -153,6 +154,75 @@ export default new OpenApiBuilder()
         400: { description: "Bad request" },
       },
     },
+  })
+  .addPath("/sales/aggregate", {
+    get: {
+      tags: [TAGS.USAGE],
+      summary: "Get aggregate of sales",
+      description: "Get aggregate of sales by `collection_name`, `timestamp` or `block_number`",
+      parameters: [
+        {
+          name: "aggregate_function",
+          in: "query",
+          description: "Aggregate function",
+          required: true,
+          schema: {enum: ['count', 'min', 'max', 'sum', 'avg', 'median'] },
+        },
+        {
+          name: "aggregate_column",
+          in: "query",
+          description: "Aggregate column",
+          required: false,
+          schema: {enum: ['listing_price_amount'] },
+        },
+        {
+          name: "collection_name",
+          in: "query",
+          description: "Filter by collection name (ex: 'pomelo')",
+          required: false,
+          schema: {type: "string"},
+        },
+        {
+          name: 'timestamp',
+          in: 'query',
+          description: 'Filter by exact timestamp',
+          required: false,
+          schema: timestampSchema,
+          examples: timestampExamples,
+        },
+        {
+          name: "block_number",
+          description: "Filter by Block number (ex: 18399498)",
+          in: "query",
+          required: false,
+          schema: { type: "number" },
+        },
+        ...["greater_or_equals_by_timestamp", "greater_by_timestamp", "less_or_equals_by_timestamp", "less_by_timestamp"].map(name => {
+          return {
+            name,
+            in: "query",
+            description: "Filter " + name.replace(/_/g, " "),
+            required: false,
+            schema: timestampSchema,
+            examples: timestampExamples,
+          } as ParameterObject
+        }),
+        ...["greater_or_equals_by_block_number", "greater_by_block_number", "less_or_equals_by_block_number", "less_by_block_number"].map(name => {
+          return {
+            name,
+            in: "query",
+            description: "Filter " + name.replace(/_/g, " "),
+            required: false,
+            schema: { type: "number" },
+          } as ParameterObject
+        }),
+      ],
+      responses: {
+        200: { description: "Aggregate of sales", content: { "text/plain": { example: aggregate_example} } },
+        400: { description: "Bad request" },
+      },
+    },
+
   })
   .addPath("/health", {
     get: {

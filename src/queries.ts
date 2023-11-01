@@ -48,8 +48,8 @@ s.collection_name as collection_name, template_id, block_number, timestamp FROM`
     if (asset_id_in_asset_ids) where.push(`has(asset_ids, ${asset_id_in_asset_ids})`)
 
     // equals
-    const collection_name = searchParams.get("collection_name");
-    const sale_id = searchParams.get("sale_id");
+    const collection_name = searchParams.get('collection_name');
+    const sale_id = searchParams.get('sale_id');
     const block_number = searchParams.get('block_number');
     const timestamp = parseTimestamp(searchParams.get('timestamp'));
     const listing_price_amount = searchParams.get('listing_price_amount');
@@ -73,5 +73,48 @@ s.collection_name as collection_name, template_id, block_number, timestamp FROM`
     const sort_by = searchParams.get("sort_by");
     query += ` ORDER BY sale_id ${sort_by ?? DEFAULT_SORT_BY}`
     query += ` LIMIT ${limit}`
+    return query;
+}
+
+export function getAggregate(searchParams: URLSearchParams) {
+    // SQL Query
+    let query = `SELECT`;
+
+    // Aggregate Function
+    const aggregate_function = searchParams.get("aggregate_function");
+    const aggregate_column = searchParams.get("aggregate_column");
+    if (aggregate_function == "count" && !aggregate_column) query += ` count()`;
+    else if (aggregate_function && aggregate_column) query += ` ${aggregate_function}(${aggregate_column})`;
+    else throw new Error("Invalid aggregate function or column");
+
+
+    query += ` FROM Sales`;
+    const where = [];
+    // Clickhouse Operators
+    // https://clickhouse.com/docs/en/sql-reference/operators
+    const operators = [
+        ["greater_or_equals", ">="],
+        ["greater", ">"],
+        ["less_or_equals", "<="],
+        ["less", "<"],
+    ]
+    for ( const [key, operator] of operators ) {
+        const block_number = searchParams.get(`${key}_by_block_number`);
+        const timestamp = parseTimestamp(searchParams.get(`${key}_by_timestamp`));
+        if (block_number) where.push(`block_number ${operator} ${block_number}`);
+        if (timestamp) where.push(`toUnixTimestamp(timestamp) ${operator} ${timestamp}`);
+    }
+
+    // equals
+    const collection_name = searchParams.get('collection_name');
+    const block_number = searchParams.get('block_number');
+    const timestamp = parseTimestamp(searchParams.get('timestamp'));
+    if (collection_name) where.push(`collection_name == '${collection_name}'`);
+    if (block_number) where.push(`block_number == '${block_number}'`);
+    if (timestamp) where.push(`toUnixTimestamp(timestamp) == ${timestamp}`);
+
+    // Join WHERE statements with AND
+    if ( where.length ) query += ` WHERE (${where.join(' AND ')})`;
+
     return query;
 }

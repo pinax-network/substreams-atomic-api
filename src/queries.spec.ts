@@ -1,14 +1,11 @@
 // from: https://github.com/pinax-network/substreams-clock-api/blob/main/src/queries.spec.ts
 
 import { expect, test } from "bun:test";
-import { getSalesCount, getSale } from "./queries.js";
+import { getSale, getAggregate } from "./queries.js";
 
 const collection_name = "pomelo";
-
-test("getSalesCount", () => {
-    expect(getSalesCount(new URLSearchParams({collection_name})))
-        .toBe(`SELECT count(sale_id) FROM Sales WHERE collection_name = '${collection_name}'`);
-});
+const aggregate_function = "min";
+const aggregate_column = "listing_price_amount";
 
 test("getSale", () => {
     expect(getSale(new URLSearchParams({collection_name})))
@@ -22,4 +19,9 @@ JOIN blocks ON blocks.block_id = s.block_id WHERE (collection_name == '${collect
 
     expect(getSale(new URLSearchParams({asset_id_in_asset_ids: '2199024044581'})))
     .toBe(`SELECT * FROM Sales JOIN blocks ON blocks.block_id = Sales.block_id WHERE (has(asset_ids, 2199024044581)) ORDER BY sale_id DESC LIMIT 1`);*/
+});
+
+test("getAggregate", () => {
+    expect(getAggregate(new URLSearchParams({aggregate_function, aggregate_column})))
+        .toBe(`SELECT ${aggregate_function}(${aggregate_column}) FROM Sales`);
 });
