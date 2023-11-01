@@ -35,26 +35,6 @@ export default new OpenApiBuilder()
   })
   .addExternalDocs({ url: pkg.homepage, description: "Extra documentation" })
   .addSecurityScheme("auth-key", { type: "http", scheme: "bearer" })
-  .addPath("/salescount", {
-    get: {
-      tags: [TAGS.USAGE],
-      summary: "Get sales count",
-      description: "Get number of sales for a collection",
-      parameters: [
-        {
-          name: "collection_name",
-          description: "Filter by collection name (ex: 'pomelo')",
-          in: "query",
-          required: false,
-          schema: { type: "string" },
-        },
-      ],
-      responses: {
-        200: { description: "Count of sales", content: { "application/json": { example: "count(sale_id): 3", schema: { type: "string" } } } },
-        400: { description: "Bad request" },
-      },
-    },
-  })
   .addPath("/sales", {
     get: {
       tags: [TAGS.USAGE],
@@ -170,26 +150,6 @@ export default new OpenApiBuilder()
       ],
       responses: {
         200: { description: "Array of sales", content: { "application/json": { example: sale_example, schema: { type: "array" } } } },
-        400: { description: "Bad request" },
-      },
-    },
-  })
-  .addPath("/totalvolume", {
-    get: {
-      tags: [TAGS.USAGE],
-      summary: "Get volume of sales",
-      description: "Get volume of sales for a collection",
-      parameters: [
-        {
-          name: "collection_name",
-          description: "Filter by collection name (ex: 'pomelo')",
-          in: "query",
-          required: false,
-          schema: { type: "string" },
-        },
-      ],
-      responses: {
-        200: { description: "Volume of sales", content: { "application/json": { example: "sum(listing_price): 10.0", schema: { type: "string" } } } },
         400: { description: "Bad request" },
       },
     },

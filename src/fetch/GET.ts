@@ -2,8 +2,6 @@ import { registry } from "../prometheus.js";
 import openapi from "./openapi.js";
 import health from "./health.js";
 import sales from "./sales.js";
-import salescount from "./salescount.js";
-import totalvolume from "./totalvolume.js";
 import * as prometheus from "../prometheus.js";
 import { logger } from "../logger.js";
 import swaggerHtml from "../../swagger/index.html"
@@ -18,8 +16,6 @@ export default async function (req: Request) {
     if ( pathname === "/metrics" ) return new Response(await registry.metrics(), {headers: {"Content-Type": registry.contentType}});
     if ( pathname === "/openapi" ) return new Response(openapi, {headers: {"Content-Type": "application/json"}});
     if ( pathname === "/sales" ) return sales(req);
-    if ( pathname === "/salescount" ) return salescount(req);
-    if ( pathname === "/totalvolume" ) return totalvolume(req);
     logger.warn(`Not found: ${pathname}`);
     prometheus.request_error.inc({pathname, status: 404});
     return new Response("Not found", { status: 404 });
