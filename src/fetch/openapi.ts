@@ -159,7 +159,7 @@ export default new OpenApiBuilder()
     get: {
       tags: [TAGS.USAGE],
       summary: "Get aggregate of sales",
-      description: "Get aggregate of sales by `collection_name`, `timestamp` or `block_number`",
+      description: "Get aggregate of sales filtered by `collection_name`, `timestamp` or `block_number`",
       parameters: [
         {
           name: "aggregate_function",

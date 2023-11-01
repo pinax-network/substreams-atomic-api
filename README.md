@@ -7,6 +7,7 @@
 |-------------------------------------------|-----------------------|
 | GET `/health`                             | Health check
 | GET `/sales`        | Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `asset_ids`
+| GET `/sales/aggregate`   | Get aggregate of sales filtered by `collection_name`, `timestamp` or `block_number`
 | GET `/metrics`                            | Prometheus metrics
 | GET `/openapi`                            | [OpenAPI v3 JSON](https://spec.openapis.org/oas/v3.0.0)
 
