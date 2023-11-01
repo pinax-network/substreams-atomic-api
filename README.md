@@ -6,9 +6,7 @@
 | Pathname                                  | Description           |
 |-------------------------------------------|-----------------------|
 | GET `/health`                             | Health check
-| GET `/sales`        | Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `asset_ids`
-| GET `/salescount`        | Number of sales for a collection
-| GET `/totalvolume`       | Volume of sales  for a collection
+| GET `/sales`        | Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `asset_ids`
 | GET `/metrics`                            | Prometheus metrics
 | GET `/openapi`                            | [OpenAPI v3 JSON](https://spec.openapis.org/oas/v3.0.0)
 
@@ -46,11 +44,40 @@ HOST=http://127.0.0.1:8123
 DATABASE=default
 USERNAME=default
 PASSWORD=
-TABLE=Sales
 MAX_LIMIT=500
 
 # Logging
 VERBOSE=true
+```
+## Expected database structure
+`substreams-sink-clickhouse` auto generates some tables (see [Database structure](https://github.com/pinax-network/substreams-sink-clickhouse#database-structure) section).
+For this API to work, you will also need to provide following schemas to `substreams-sink-clickhouse` (see [Schema initialization](https://github.com/pinax-network/substreams-sink-clickhouse#schema-initialization) section):
+- `substreams-atomicmarket-sales` [schema](https://github.com/pinax-network/substreams-atomicmarket-sales/blob/master/schema.sql)
+- `substreams-atomicassets` [schema](https://github.com/pinax-network/substreams-atomicassets/blob/master/schema.sql)
+  
+The expected added tables to the database structure will then be:
+```mermaid
+erDiagram
+    Sales }|--|{ Assets : " "
+
+    Sales {
+        sale_id     UInt64
+        trx_id      String
+        asset_ids   Array(UInt64)
+        listing_price_amount  Int64
+        listing_price_precision  UInt8
+        listing_price_symcode    String
+        collection_name String
+
+    }
+
+    Assets {
+        asset_id     UInt64
+        scope        String
+        collection_name String
+        template_id  Int32
+
+    }
 ```
 ## Help
 
