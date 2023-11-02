@@ -173,7 +173,7 @@ export default new OpenApiBuilder()
           in: "query",
           description: "Aggregate column",
           required: false,
-          schema: {enum: ['listing_price_amount', 'sale_id', 'asset_ids', 'listing_price_value'] },
+          schema: {enum: ['listing_price_amount', 'sale_id', 'total_asset_ids', 'listing_price_value'] },
         },
         {
           name: "collection_name",

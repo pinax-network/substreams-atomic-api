@@ -11,6 +11,10 @@
 | GET `/metrics`                            | Prometheus metrics
 | GET `/openapi`                            | [OpenAPI v3 JSON](https://spec.openapis.org/oas/v3.0.0)
 
+Supported aggregate functions : `count`, `sum`, `min`, `max`, `avg`, `median`
+
+Supported aggregate columns: `sale_id`, `total_asset_ids`, `listing_price_amount`, `listing_price_value`
+
 ## Requirements
 
 - [Clickhouse](https://clickhouse.com/)
@@ -53,7 +57,7 @@ VERBOSE=true
 ## Expected database structure
 `substreams-sink-clickhouse` auto generates some tables (see [Database structure](https://github.com/pinax-network/substreams-sink-clickhouse#database-structure) section).
 For this API to work, you will also need to provide following schemas to `substreams-sink-clickhouse` (see [Schema initialization](https://github.com/pinax-network/substreams-sink-clickhouse#schema-initialization) section):
-- `substreams-atomicmarket-sales` [schema](https://github.com/pinax-network/substreams-atomicmarket-sales/blob/master/schema.sql)
+- `substreams-atomicmarket-sales` [schema](https://github.com/pinax-network/substreams-atomicmarket-sales/blob/develop/schema.sql)
 - `substreams-atomicassets` [schema](https://github.com/pinax-network/substreams-atomicassets/blob/master/schema.sql)
   
 The expected added tables to the database structure will then be:
@@ -68,6 +72,7 @@ erDiagram
         listing_price_amount  Int64
         listing_price_precision  UInt8
         listing_price_symcode    String
+        listing_price_value      Float64
         collection_name String
 
     }

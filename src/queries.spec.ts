@@ -21,11 +21,14 @@ JOIN blocks ON blocks.block_id = s.block_id WHERE (collection_name == '${collect
 
 test("getAggregate", () => {
     expect(getAggregate(new URLSearchParams({aggregate_function: 'count', collection_name})))
-        .toBe(`SELECT count() FROM Sales JOIN blocks ON blocks.block_id = Sales.block_id WHERE (collection_name == '${collection_name}')`);
+        .toBe(`SELECT count() FROM Sales AS s JOIN blocks ON blocks.block_id = s.block_id WHERE (collection_name == '${collection_name}')`);
 
     expect(getAggregate(new URLSearchParams({aggregate_function: 'count', aggregate_column: 'sale_id'})))
-        .toBe(`SELECT count(sale_id) FROM Sales JOIN blocks ON blocks.block_id = Sales.block_id`);
+        .toBe(`SELECT count(sale_id) FROM Sales AS s JOIN blocks ON blocks.block_id = s.block_id`);
 
     expect(getAggregate(new URLSearchParams({aggregate_function: 'max', aggregate_column: 'listing_price_amount'})))
-        .toBe(`SELECT max(listing_price_amount) FROM Sales JOIN blocks ON blocks.block_id = Sales.block_id`);
+        .toBe(`SELECT max(listing_price_amount) FROM Sales AS s JOIN blocks ON blocks.block_id = s.block_id`);
+    
+    expect(getAggregate(new URLSearchParams({aggregate_function: 'max', aggregate_column: 'total_asset_ids'})))
+        .toBe(`SELECT max(total_asset_ids) FROM (SELECT length(asset_ids) AS total_asset_ids, block_id FROM Sales) AS s JOIN blocks ON blocks.block_id = s.block_id`);
 });
