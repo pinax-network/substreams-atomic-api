@@ -1,12 +1,46 @@
 import { expect, test } from "bun:test";
-import { parseBlockId, parseLimit, parseTimestamp } from "./utils.js";
+import { parseCollectionName, parsePositiveInt, parseListingPriceValue, parseListingPriceSymcode, parseTransactionId, parseLimit, parseTimestamp } from "./utils.js";
 import { DEFAULT_MAX_LIMIT } from "./config.js";
 
-test("parseBlockId", () => {
-    expect(parseBlockId()).toBeUndefined();
-    expect(parseBlockId(null)).toBeUndefined();
-    expect(parseBlockId("00fef8cf2a2c73266f7c0b71fb5762f9a36419e51a7c05b0e82f9e3bacb859bc")).toBe("00fef8cf2a2c73266f7c0b71fb5762f9a36419e51a7c05b0e82f9e3bacb859bc");
-    expect(parseBlockId("0x00fef8cf2a2c73266f7c0b71fb5762f9a36419e51a7c05b0e82f9e3bacb859bc")).toBe("00fef8cf2a2c73266f7c0b71fb5762f9a36419e51a7c05b0e82f9e3bacb859bc");
+test("parseCollectionName", () => {
+    expect(parseCollectionName()).toBeUndefined();
+    expect(parseCollectionName(null)).toBeUndefined();
+    expect(parseCollectionName("pomelo")).toBe("pomelo");
+    expect(parseCollectionName("222wombat222")).toBe("222wombat222");
+});
+
+test("parsePositiveInt", () => {
+    expect(parsePositiveInt()).toBeUndefined();
+    expect(parsePositiveInt(null)).toBeUndefined();
+    expect(parsePositiveInt(-1)).toBeUndefined();
+    expect(parsePositiveInt("invalid")).toBeNaN();
+    expect(parsePositiveInt("10")).toBe(10);
+    expect(parsePositiveInt(10)).toBe(10);
+});
+
+test("parseListingPriceValue", () => {
+    expect(parseListingPriceValue()).toBeUndefined();
+    expect(parseListingPriceValue(null)).toBeUndefined();
+    expect(parseListingPriceValue(-1)).toBeUndefined();
+    expect(parseListingPriceValue("invalid")).toBeNaN();
+    expect(parseListingPriceValue("10.5")).toBe(10.5);
+    expect(parseListingPriceValue(0.7)).toBe(0.7);
+});
+
+test("parseListingPriceSymcode", () => {
+    expect(parseListingPriceSymcode()).toBeUndefined();
+    expect(parseListingPriceSymcode(null)).toBeUndefined();
+    expect(parseListingPriceSymcode("invalid")).toBeUndefined();
+    expect(parseListingPriceSymcode("EOS")).toBe("EOS");
+    expect(parseListingPriceSymcode("USD")).toBe("USD");
+});
+
+test("parseTransactionID", () => {
+    expect(parseTransactionId()).toBeUndefined();
+    expect(parseTransactionId(null)).toBeUndefined();
+    expect(parseTransactionId("invalid")).toBeUndefined();
+    expect(parseTransactionId("174773c1b239a2189be75589a0f1cb483ce15280c0a3549c46f7388573baa3ca")).toBe("174773c1b239a2189be75589a0f1cb483ce15280c0a3549c46f7388573baa3ca");
+    expect(parseTransactionId("0x00fef8cf2a2c73266f7c0b71fb5762f9a36419e51a7c05b0e82f9e3bacb859bc")).toBe("00fef8cf2a2c73266f7c0b71fb5762f9a36419e51a7c05b0e82f9e3bacb859bc");
 });
 
 test("parseLimit", () => {
@@ -37,5 +71,3 @@ test("parseTimestamp", () => {
     expect(() => parseTimestamp(10)).toThrow("Invalid timestamp");
     expect(() => parseTimestamp("10")).toThrow("Invalid timestamp");
 });
-
-

@@ -40,7 +40,7 @@ export default new OpenApiBuilder()
     get: {
       tags: [TAGS.USAGE],
       summary: "Get sales",
-      description: "Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `asset_id_in_asset_ids`",
+      description: "Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `listing_price_value`, `trx_id` or `contains_asset_id`",
       parameters: [
         {
           name: "collection_name",
@@ -86,6 +86,13 @@ export default new OpenApiBuilder()
           schema: { type: "number" },
         },
         {
+          name: "listing_price_value",
+          description: "Filter by listing price value (ex: 1.0)",
+          in: "query",
+          required: false,
+          schema: { type: "number" },
+        },
+        {
           name: "listing_price_symcode",
           description: "Filter by listing price symcode (ex: 'EOS')",
           in: "query",
@@ -100,7 +107,7 @@ export default new OpenApiBuilder()
           schema: { type: "string" },
         },
         {
-          name: "asset_id_in_asset_ids",
+          name: "contains_asset_id",
           description: "Filter by asset ID in list of asset IDs in the sale (ex: 2199023842153)",
           in: "query",
           required: false,
@@ -133,6 +140,15 @@ export default new OpenApiBuilder()
           } as ParameterObject
         }),
         ...["greater_or_equals_by_listing_price_amount", "greater_by_listing_price_amount", "less_or_equals_by_listing_price_amount", "less_by_listing_price_amount"].map(name => {
+          return {
+            name,
+            in: "query",
+            description: "Filter " + name.replace(/_/g, " "),
+            required: false,
+            schema: { type: "number" },
+          } as ParameterObject
+        }),
+        ...["greater_or_equals_by_listing_price_value", "greater_by_listing_price_value", "less_or_equals_by_listing_price_value", "less_by_listing_price_value"].map(name => {
           return {
             name,
             in: "query",

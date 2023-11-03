@@ -1,5 +1,6 @@
 import { DEFAULT_SORT_BY, config } from './config.js';
-import { parseBlockId, parseLimit, parseTimestamp } from './utils.js';
+import { parseCollectionName, parseTimestamp, parsePositiveInt, parseListingPriceValue, parseListingPriceSymcode,
+     parseTransactionId, parseLimit, parseSortBy } from './utils.js';
 
 export interface Sale {
     collection_name: string,
@@ -8,13 +9,14 @@ export interface Sale {
     block_number: number,
     listing_price_amount: number,
     listing_price_symcode: string,
+    listing_price_value: number,
     trx_id: string,
     asset_ids: number[],
 }
 
 export function getSale(searchParams: URLSearchParams) {
     // SQL Query
-    let query = `SELECT sale_id, trx_id, asset_ids, listing_price_amount, listing_price_precision, listing_price_symcode,
+    let query = `SELECT sale_id, trx_id, asset_ids, listing_price_amount, listing_price_precision, listing_price_symcode, listing_price_value,
 s.collection_name as collection_name, template_id, block_number, timestamp FROM`;
     
     // explode asset_ids array (useful for bundle sales)
@@ -35,32 +37,36 @@ s.collection_name as collection_name, template_id, block_number, timestamp FROM`
         ["less", "<"],
     ]
     for ( const [key, operator] of operators ) {
-        const block_number = searchParams.get(`${key}_by_block_number`);
+        const block_number = parsePositiveInt(searchParams.get(`${key}_by_block_number`));
         const timestamp = parseTimestamp(searchParams.get(`${key}_by_timestamp`));
-        const listing_price_amount = searchParams.get(`${key}_by_listing_price_amount`);
+        const listing_price_amount = parsePositiveInt(searchParams.get(`${key}_by_listing_price_amount`));
+        const listing_price_value = parseListingPriceValue(searchParams.get(`${key}_by_listing_price_value`));
         if (block_number) where.push(`block_number ${operator} ${block_number}`);
         if (timestamp) where.push(`toUnixTimestamp(timestamp) ${operator} ${timestamp}`);
         if (listing_price_amount) where.push(`listing_price_amount ${operator} ${listing_price_amount}`);
+        if (listing_price_value) where.push(`listing_price_value ${operator} ${listing_price_value}`);
     }
 
     // contains asset_id
-    const asset_id_in_asset_ids = searchParams.get("asset_id_in_asset_ids");
-    if (asset_id_in_asset_ids) where.push(`has(asset_ids, ${asset_id_in_asset_ids})`)
+    const contains_asset_id = parsePositiveInt(searchParams.get("contains_asset_id"));
+    if (contains_asset_id) where.push(`asset_ids == ${contains_asset_id}`)
 
     // equals
-    const collection_name = searchParams.get('collection_name');
-    const sale_id = searchParams.get('sale_id');
-    const block_number = searchParams.get('block_number');
+    const collection_name = parseCollectionName(searchParams.get('collection_name'));
+    const sale_id = parsePositiveInt(searchParams.get('sale_id'));
+    const block_number = parsePositiveInt(searchParams.get('block_number'));
     const timestamp = parseTimestamp(searchParams.get('timestamp'));
-    const listing_price_amount = searchParams.get('listing_price_amount');
-    const listing_price_symcode = searchParams.get('listing_price_symcode');
-    const trx_id = searchParams.get('trx_id');
-    const template_id = searchParams.get('template_id');
+    const listing_price_amount = parsePositiveInt(searchParams.get('listing_price_amount'));
+    const listing_price_value = parseListingPriceValue(searchParams.get('listing_price_value'));
+    const listing_price_symcode = parseListingPriceSymcode(searchParams.get('listing_price_symcode'));
+    const trx_id = parseTransactionId(searchParams.get('trx_id'));
+    const template_id = parsePositiveInt(searchParams.get('template_id'));
     if (collection_name) where.push(`collection_name == '${collection_name}'`);
     if (sale_id) where.push(`sale_id == '${sale_id}'`);
     if (block_number) where.push(`block_number == '${block_number}'`);
     if (timestamp) where.push(`toUnixTimestamp(timestamp) == ${timestamp}`);
     if (listing_price_amount) where.push(`listing_price_amount == ${listing_price_amount}`);
+    if (listing_price_value) where.push(`listing_price_value == ${listing_price_value}`);
     if (listing_price_symcode) where.push(`listing_price_symcode == '${listing_price_symcode}'`);
     if (trx_id) where.push(`trx_id == '${trx_id}'`);
     if (template_id) where.push(`template_id == '${template_id}'`);
@@ -70,7 +76,7 @@ s.collection_name as collection_name, template_id, block_number, timestamp FROM`
 
     // Sort and Limit
     const limit = parseLimit(searchParams.get("limit"));
-    const sort_by = searchParams.get("sort_by");
+    const sort_by = parseSortBy(searchParams.get("sort_by"));
     query += ` ORDER BY sale_id ${sort_by ?? DEFAULT_SORT_BY}`
     query += ` LIMIT ${limit}`
     return query;
@@ -81,12 +87,14 @@ export function getAggregate(searchParams: URLSearchParams) {
     let query = `SELECT`;
 
     // Aggregate Function
+    // @TODO: make this valid check in a parser
     const valid_agg_functions = ["min", "max", "avg", "sum", "count", "median"];
     const aggregate_function = searchParams.get("aggregate_function");
     if(!aggregate_function) throw new Error("Aggregate function is required");
     if (aggregate_function && !valid_agg_functions.includes(aggregate_function)) throw new Error("Aggregate function not supported");
 
     // Aggregate Column
+    // @TODO: make this valid check in a parser
     const valid_agg_columns = ["sale_id", "total_asset_ids", "listing_price_amount", "listing_price_value"];
     const aggregate_column = searchParams.get("aggregate_column");
     if (aggregate_column && !valid_agg_columns.includes(aggregate_column)) throw new Error("Aggregate column not supported");
@@ -122,15 +130,15 @@ export function getAggregate(searchParams: URLSearchParams) {
         ["less", "<"],
     ]
     for ( const [key, operator] of operators ) {
-        const block_number = searchParams.get(`${key}_by_block_number`);
+        const block_number = parsePositiveInt(searchParams.get(`${key}_by_block_number`));
         const timestamp = parseTimestamp(searchParams.get(`${key}_by_timestamp`));
         if (block_number) where.push(`block_number ${operator} ${block_number}`);
         if (timestamp) where.push(`toUnixTimestamp(timestamp) ${operator} ${timestamp}`);
     }
 
     // equals
-    const collection_name = searchParams.get('collection_name');
-    const block_number = searchParams.get('block_number');
+    const collection_name = parseCollectionName(searchParams.get('collection_name'));
+    const block_number = parsePositiveInt(searchParams.get('block_number'));
     const timestamp = parseTimestamp(searchParams.get('timestamp'));
     if (collection_name) where.push(`collection_name == '${collection_name}'`);
     if (block_number) where.push(`block_number == '${block_number}'`);

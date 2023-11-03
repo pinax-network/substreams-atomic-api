@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@clickhouse/client-web": "latest",
+    "@wharfkit/antelope": "^0.10.1",
     "commander": "latest",
     "dotenv": "latest",
     "openapi3-ts": "latest",

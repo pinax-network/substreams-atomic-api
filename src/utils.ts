@@ -1,19 +1,52 @@
-import { config } from "./config.js";
+import { z } from 'zod';
+import { Name, Asset } from "@wharfkit/antelope";
+import { DEFAULT_SORT_BY, config } from "./config.js";
 
-export function parseLimit(limit?: string|null|number) {
-    let value = 1; // default 1
-    if (limit) {
-        if (typeof limit === "string") value = parseInt(limit);
-        if (typeof limit === "number") value = limit;
+export function parseCollectionName(collection_name?: string|null) {
+    if (!z.string().regex(Name.pattern).safeParse(collection_name).success) {
+        return undefined;
     }
-    // limit must be between 1 and maxLimit
-    if ( value > config.maxLimit ) value = config.maxLimit;
+
+    return collection_name;
+}
+
+export function parsePositiveInt(number?: string|null|number) {
+    let value = undefined;
+    if (number) {
+        if (typeof number === "string") value = parseInt(number);
+        if (typeof number === "number") value = number;
+    }
+    // Must be non-negative number
+    if ( value && value <= 0 ) value = undefined;
     return value;
 }
 
-// need to change to block number instead of ID
-export function parseBlockId(block_id?: string|null) {
-    return block_id ? block_id.replace("0x", "") : undefined;
+export function parseListingPriceValue(listing_price_value?: string|null|number) {
+    let value = undefined;
+    if (listing_price_value) {
+        if (typeof listing_price_value === "string") value = parseFloat(listing_price_value);
+        if (typeof listing_price_value === "number") value = listing_price_value;
+    }
+    // Must be non-negative number
+    if ( value && value < 0 ) value = undefined;
+    return value;
+}
+
+export function parseListingPriceSymcode(listing_price_symcode?: string|null) {
+    if (!z.string().regex(Asset.Symbol.symbolNamePattern).safeParse(listing_price_symcode).success) {
+        return undefined;
+    }
+
+    return listing_price_symcode;
+}
+
+export function parseTransactionId(trx_id?: string|null) {
+    // Match against hexadecimal string (with or without '0x' prefix)
+    if (!z.string().regex(/^(0x)?[a-fA-F0-9]+$/).safeParse(trx_id).success) {
+        return undefined;
+    }
+
+    return trx_id ? trx_id.replace("0x", "") : undefined;
 }
 
 export function parseTimestamp(timestamp?: string|null|number) {
@@ -34,4 +67,24 @@ export function parseTimestamp(timestamp?: string|null|number) {
         }
     }
     return undefined;
+}
+
+export function parseLimit(limit?: string|null|number) {
+    let value = 1; // default 1
+    if (limit) {
+        if (typeof limit === "string") value = parseInt(limit);
+        if (typeof limit === "number") value = limit;
+    }
+    // limit must be between 1 and maxLimit
+    if (value <= 0) value = 1;
+    if ( value > config.maxLimit ) value = config.maxLimit;
+    return value;
+}
+
+export function parseSortBy(sort_by?: string|null) {
+    if (!z.enum(["ASC", "DESC"]).safeParse(sort_by).success) {
+        return DEFAULT_SORT_BY;
+    }
+
+    return sort_by;
 }
