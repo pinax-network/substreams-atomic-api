@@ -1,5 +1,5 @@
-# [`Substreams`](https://substreams.streamingfast.io/) Atomicmarket API
-[![.github/workflows/bun-test.yml](https://github.com/pinax-network/substreams-atomicmarket-api/actions/workflows/bun-test.yml/badge.svg)](https://github.com/pinax-network/substreams-atomicmarket-api/actions/workflows/bun-test.yml)
+# [`Substreams`](https://substreams.streamingfast.io/) Atomic API
+[![.github/workflows/bun-test.yml](https://github.com/pinax-network/substreams-atomic-api/actions/workflows/bun-test.yml/badge.svg)](https://github.com/pinax-network/substreams-atomic-api/actions/workflows/bun-test.yml)
 
 ## REST API
 
@@ -33,8 +33,8 @@ $ bun dev
 > Linux Only
 
 ```console
-$ wget https://github.com/pinax-network/substreams-atomicmarket-api/releases/download/v0.2.0/substreams-atomicmarket-api
-$ chmod +x ./substreams-atomicmarket-api
+$ wget https://github.com/pinax-network/substreams-atomic-api/releases/download/v0.2.0/substreams-atomic-api
+$ chmod +x ./substreams-atomic-api
 ```
 
 ## `.env` Environment variables
@@ -57,7 +57,7 @@ VERBOSE=true
 ## Expected database structure
 `substreams-sink-clickhouse` auto generates some tables (see [Database structure](https://github.com/pinax-network/substreams-sink-clickhouse#database-structure) section).
 For this API to work, you will also need to provide following schemas to `substreams-sink-clickhouse` (see [Schema initialization](https://github.com/pinax-network/substreams-sink-clickhouse#schema-initialization) section):
-- `substreams-atomicmarket-sales` [schema](https://github.com/pinax-network/substreams-atomicmarket-sales/blob/develop/schema.sql)
+- `substreams-atomicmarket-sales` [schema](https://github.com/pinax-network/substreams-atomicmarket-sales/blob/master/schema.sql)
 - `substreams-atomicassets` [schema](https://github.com/pinax-network/substreams-atomicassets/blob/master/schema.sql)
   
 The expected added tables to the database structure will then be:
@@ -88,10 +88,10 @@ erDiagram
 ## Help
 
 ```console
-$ ./substreams-atomicmarket-api -h
-Usage: substreams-atomicmarket-api [options]
+$ ./substreams-atomic-api -h
+Usage: substreams-atomic-api [options]
 
-Atomicmarket sales API
+Atomic API
 
 Options:
   -V, --version            output the version number
@@ -110,15 +110,15 @@ Options:
 
 Pull from GitHub Container registry
 ```bash
-docker pull ghcr.io/pinax-network/substreams-atomicmarket-api:latest
+docker pull ghcr.io/pinax-network/substreams-atomic-api:latest
 ```
 
 Build from source
 ```bash
-docker build -t substreams-atomicmarket-api .
+docker build -t substreams-atomic-api .
 ```
 
 Run with `.env` file
 ```bash
-docker run -it --rm --env-file .env ghcr.io/pinax-network/substreams-atomicmarket-api
+docker run -it --rm --env-file .env ghcr.io/pinax-network/substreams-atomic-api
 ```

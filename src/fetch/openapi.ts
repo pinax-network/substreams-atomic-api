@@ -181,7 +181,7 @@ export default new OpenApiBuilder()
           name: "aggregate_function",
           in: "query",
           description: "Aggregate function",
-          required: true,
+          required: false,
           schema: {enum: ['count', 'min', 'max', 'sum', 'avg', 'median'] },
         },
         {
