@@ -11,9 +11,10 @@ export const DEFAULT_DATABASE = "default";
 export const DEFAULT_USERNAME = "default";
 export const DEFAULT_PASSWORD = "";
 export const DEFAULT_MAX_LIMIT = 10000;
-export const DEFAULT_VERBOSE = false;
+export const DEFAULT_VERBOSE = true;
 export const APP_NAME = pkg.name;
 export const DEFAULT_SORT_BY = "DESC";
+export const DEFAULT_AGGREGATE_FUNCTION = "count";
 
 // parse command line options
 const opts = program

@@ -4,7 +4,7 @@ import { name } from "../package.json" assert { type: "json" };
 class TsLogger extends Logger<ILogObj> {
     constructor() {
         super();
-        this.settings.minLevel = 5;
+        this.disable();
         this.settings.name = name;
     }
 
@@ -15,6 +15,7 @@ class TsLogger extends Logger<ILogObj> {
 
     public disable() {
         this.settings.type = "hidden";
+        this.settings.minLevel = 5;
     }
 }
 
