@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Name, Asset } from "@wharfkit/antelope";
-import { DEFAULT_SORT_BY, config } from "./config.js";
+import { DEFAULT_SORT_BY, DEFAULT_AGGREGATE_FUNCTION, config } from "./config.js";
+import { logger } from './logger.js';
 
 export function parseCollectionName(collection_name?: string|null) {
     if (!z.string().regex(Name.pattern).safeParse(collection_name).success) {
@@ -87,4 +88,20 @@ export function parseSortBy(sort_by?: string|null) {
     }
 
     return sort_by;
+}
+
+export function parseAggregateFunction(aggregate_function?: string|null) {
+    if (!z.enum(["min", "max", "avg", "sum", "count", "median"]).safeParse(aggregate_function).success) {
+        logger.info("Aggregate function not supported, using default");    
+        return DEFAULT_AGGREGATE_FUNCTION;
+    }
+
+    return aggregate_function;
+}
+
+export function parseAggregateColumn(aggregate_column?: string|null) {
+    if (!z.enum(["sale_id", "total_asset_ids", "listing_price_amount", "listing_price_value"]).safeParse(aggregate_column).success) {
+        return undefined;
+    }
+    return aggregate_column;
 }

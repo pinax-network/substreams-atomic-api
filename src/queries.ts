@@ -1,6 +1,6 @@
 import { DEFAULT_SORT_BY, config } from './config.js';
 import { parseCollectionName, parseTimestamp, parsePositiveInt, parseListingPriceValue, parseListingPriceSymcode,
-     parseTransactionId, parseLimit, parseSortBy } from './utils.js';
+     parseTransactionId, parseLimit, parseSortBy, parseAggregateFunction, parseAggregateColumn } from './utils.js';
 
 export interface Sale {
     collection_name: string,
@@ -87,17 +87,10 @@ export function getAggregate(searchParams: URLSearchParams) {
     let query = `SELECT`;
 
     // Aggregate Function
-    // @TODO: make this valid check in a parser
-    const valid_agg_functions = ["min", "max", "avg", "sum", "count", "median"];
-    const aggregate_function = searchParams.get("aggregate_function");
-    if(!aggregate_function) throw new Error("Aggregate function is required");
-    if (aggregate_function && !valid_agg_functions.includes(aggregate_function)) throw new Error("Aggregate function not supported");
+    const aggregate_function = parseAggregateFunction(searchParams.get("aggregate_function"));
 
     // Aggregate Column
-    // @TODO: make this valid check in a parser
-    const valid_agg_columns = ["sale_id", "total_asset_ids", "listing_price_amount", "listing_price_value"];
-    const aggregate_column = searchParams.get("aggregate_column");
-    if (aggregate_column && !valid_agg_columns.includes(aggregate_column)) throw new Error("Aggregate column not supported");
+    const aggregate_column = parseAggregateColumn(searchParams.get("aggregate_column"));
 
     if (aggregate_function == "count"  && aggregate_column != "total_asset_ids")  {
         if (aggregate_column) query += ` count(${aggregate_column})`;

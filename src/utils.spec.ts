@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { parseCollectionName, parsePositiveInt, parseListingPriceValue, parseListingPriceSymcode, parseTransactionId, parseLimit, parseTimestamp } from "./utils.js";
+import { parseCollectionName, parsePositiveInt, parseListingPriceValue, parseListingPriceSymcode, parseTransactionId,
+     parseLimit, parseTimestamp, parseAggregateFunction, parseAggregateColumn } from "./utils.js";
 import { DEFAULT_MAX_LIMIT } from "./config.js";
 
 test("parseCollectionName", () => {
@@ -70,4 +71,25 @@ test("parseTimestamp", () => {
     // errors
     expect(() => parseTimestamp(10)).toThrow("Invalid timestamp");
     expect(() => parseTimestamp("10")).toThrow("Invalid timestamp");
+});
+
+test("parseAggregateFunction", () => {
+    expect(parseAggregateFunction()).toBeUndefined();
+    expect(parseAggregateFunction(null)).toBeUndefined();
+    expect(parseAggregateFunction("invalid")).toBeUndefined();
+    expect(parseAggregateFunction("count")).toBe("count");
+    expect(parseAggregateFunction("sum")).toBe("sum");
+    expect(parseAggregateFunction("avg")).toBe("avg");
+    expect(parseAggregateFunction("min")).toBe("min");
+    expect(parseAggregateFunction("max")).toBe("max");
+});
+
+test("parseAggregateColumn", () => {
+    expect(parseAggregateColumn()).toBeUndefined();
+    expect(parseAggregateColumn(null)).toBeUndefined();
+    expect(parseAggregateColumn("invalid")).toBeUndefined();
+    expect(parseAggregateColumn("sale_id")).toBe("sale_id");
+    expect(parseAggregateColumn("listing_price_amount")).toBe("listing_price_amount");
+    expect(parseAggregateColumn("listing_price_value")).toBe("listing_price_value");
+    expect(parseAggregateColumn("total_asset_ids")).toBe("total_asset_ids");
 });
