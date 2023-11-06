@@ -2,6 +2,7 @@ import pkg from "../../package.json" assert { type: "json" };
 
 import { OpenApiBuilder, SchemaObject, ExampleObject, ParameterObject } from "openapi3-ts/oas31";
 import { config } from "../config.js";
+import { store } from "../clickhouse/stores.js";
 import { getSale, getAggregate } from "../queries.js";
 import { registry } from "../prometheus.js";
 import { makeQuery } from "../clickhouse/makeQuery.js";
@@ -45,9 +46,9 @@ export default new OpenApiBuilder()
         {
           name: "collection_name",
           in: "query",
-          description: "Filter by collection name (ex: 'pomelo')",
+          description: "Filter by collection name",
           required: false,
-          schema: {type: "string"},
+          schema: {enum: await store.collection_names},
         },
         {
           name: "sale_id",
@@ -194,9 +195,9 @@ export default new OpenApiBuilder()
         {
           name: "collection_name",
           in: "query",
-          description: "Filter by collection name (ex: 'pomelo')",
+          description: "Filter by collection name",
           required: false,
-          schema: {type: "string"},
+          schema: {enum: await store.collection_names},
         },
         {
           name: 'timestamp',
