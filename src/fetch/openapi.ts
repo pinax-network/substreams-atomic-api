@@ -167,7 +167,7 @@ export default new OpenApiBuilder()
       ],
       responses: {
         200: { description: "Array of sales", content: { "application/json": { example: sale_example, schema: { type: "array" } } } },
-        400: { description: "Bad request" },
+        400: { description: "Bad request", content: { "text/plain": { example: "Bad request", schema: { type: "string" } } }, },
       },
     },
   })
@@ -235,7 +235,7 @@ export default new OpenApiBuilder()
       ],
       responses: {
         200: { description: "Aggregate of sales", content: { "text/plain": { example: aggregate_example} } },
-        400: { description: "Bad request" },
+        400: { description: "Bad request", content: { "text/plain": { example: "Bad request", schema: { type: "string" } } }, },
       },
     },
 
