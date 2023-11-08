@@ -6,14 +6,14 @@
 | <div style="width:200px">Pathname</div>| Description           |
 |----------------------------------------|-----------------------|
 | GET `/health`                          | Health check
-| GET `/sales`                           | Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `listing_price_value`, `trx_id` or `contains_asset_id`
+| GET `/sales`                           | Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `contains_asset_id`
 | GET `/sales/aggregate`                 | Get aggregate of sales filtered by `collection_name`, `timestamp` or `block_number`
 | GET `/metrics`                         | Prometheus metrics
 | GET `/openapi`                         | [OpenAPI v3 JSON](https://spec.openapis.org/oas/v3.0.0)
 
 Supported aggregate functions : `count`, `sum`, `min`, `max`, `avg`, `median`
 
-Supported aggregate columns: `sale_id`, `total_asset_ids`, `listing_price_amount`, `listing_price_value`
+Supported aggregate columns: `sale_id`, `total_asset_ids`, `listing_price_amount`
 
 ## Requirements
 
@@ -72,7 +72,6 @@ erDiagram
         listing_price_amount  Int64
         listing_price_precision  UInt8
         listing_price_symcode    String
-        listing_price_value      Float64
         collection_name String
 
     }

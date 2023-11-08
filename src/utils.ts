@@ -22,17 +22,6 @@ export function parsePositiveInt(number?: string|null|number) {
     return value;
 }
 
-export function parseListingPriceValue(listing_price_value?: string|null|number) {
-    let value = undefined;
-    if (listing_price_value) {
-        if (typeof listing_price_value === "string") value = parseFloat(listing_price_value);
-        if (typeof listing_price_value === "number") value = listing_price_value;
-    }
-    // Must be non-negative number
-    if ( value && value < 0 ) value = undefined;
-    return value;
-}
-
 export function parseListingPriceSymcode(listing_price_symcode?: string|null) {
     if (!z.string().regex(Asset.Symbol.symbolNamePattern).safeParse(listing_price_symcode).success) {
         return undefined;

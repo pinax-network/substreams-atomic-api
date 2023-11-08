@@ -41,7 +41,7 @@ export default new OpenApiBuilder()
     get: {
       tags: [TAGS.USAGE],
       summary: "Get sales",
-      description: "Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `listing_price_value`, `trx_id` or `contains_asset_id`",
+      description: "Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `contains_asset_id`",
       parameters: [
         {
           name: "collection_name",
@@ -82,13 +82,6 @@ export default new OpenApiBuilder()
         {
           name: "listing_price_amount",
           description: "Filter by listing price amount (ex: 100)",
-          in: "query",
-          required: false,
-          schema: { type: "number" },
-        },
-        {
-          name: "listing_price_value",
-          description: "Filter by listing price value (ex: 1.0)",
           in: "query",
           required: false,
           schema: { type: "number" },
@@ -149,15 +142,6 @@ export default new OpenApiBuilder()
             schema: { type: "number" },
           } as ParameterObject
         }),
-        ...["greater_or_equals_by_listing_price_value", "greater_by_listing_price_value", "less_or_equals_by_listing_price_value", "less_by_listing_price_value"].map(name => {
-          return {
-            name,
-            in: "query",
-            description: "Filter " + name.replace(/_/g, " "),
-            required: false,
-            schema: { type: "number" },
-          } as ParameterObject
-        }),
         {
           name: "limit",
           in: "query",
@@ -190,7 +174,7 @@ export default new OpenApiBuilder()
           in: "query",
           description: "Aggregate column",
           required: false,
-          schema: {enum: ['listing_price_amount', 'sale_id', 'total_asset_ids', 'listing_price_value'] },
+          schema: {enum: ['listing_price_amount', 'sale_id', 'total_asset_ids'] },
         },
         {
           name: "collection_name",

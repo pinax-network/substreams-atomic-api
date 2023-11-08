@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { parseCollectionName, parsePositiveInt, parseListingPriceValue, parseListingPriceSymcode, parseTransactionId,
+import { parseCollectionName, parsePositiveInt, parseListingPriceSymcode, parseTransactionId,
      parseLimit, parseTimestamp, parseAggregateFunction, parseAggregateColumn } from "./utils.js";
 import { DEFAULT_MAX_LIMIT } from "./config.js";
 
@@ -17,15 +17,6 @@ test("parsePositiveInt", () => {
     expect(parsePositiveInt("invalid")).toBeNaN();
     expect(parsePositiveInt("10")).toBe(10);
     expect(parsePositiveInt(10)).toBe(10);
-});
-
-test("parseListingPriceValue", () => {
-    expect(parseListingPriceValue()).toBeUndefined();
-    expect(parseListingPriceValue(null)).toBeUndefined();
-    expect(parseListingPriceValue(-1)).toBeUndefined();
-    expect(parseListingPriceValue("invalid")).toBeNaN();
-    expect(parseListingPriceValue("10.5")).toBe(10.5);
-    expect(parseListingPriceValue(0.7)).toBe(0.7);
 });
 
 test("parseListingPriceSymcode", () => {
