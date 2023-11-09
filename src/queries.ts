@@ -85,14 +85,18 @@ export function getAggregate(searchParams: URLSearchParams) {
     // Aggregate Column
     const aggregate_column = parseAggregateColumn(searchParams.get("aggregate_column"));
 
+    // Listing Price Symcode
+    const listing_price_symcode = parseListingPriceSymcode(searchParams.get('listing_price_symcode'));
+
     if (aggregate_function == "count"  && aggregate_column != "total_asset_ids")  {
         if (aggregate_column) query += ` count(${aggregate_column})`;
         else query += ` count()`;
     }
 
     // for total asset ids we need a subquery
-    else if (aggregate_column == "total_asset_ids") query += ` ${aggregate_function}(${aggregate_column}) FROM (SELECT length(asset_ids) AS total_asset_ids, block_id`;
-    else if (aggregate_column != "sale_id") query += ` ${aggregate_function}(${aggregate_column})`
+    else if (aggregate_column == "total_asset_ids") query += ` ${aggregate_function}(${aggregate_column}) FROM (SELECT length(asset_ids) AS total_asset_ids`;
+    else if (aggregate_column == "listing_price_amount" &&  (listing_price_symcode)) query += ` ${aggregate_function}(${aggregate_column})`
+    else if (aggregate_column == "listing_price_amount" &&  !(listing_price_symcode)) throw new Error("Please specify a Symbol Code");
     else throw new Error("Invalid aggregate column with given aggregate function");
 
     query += ` FROM Sales`;
@@ -102,9 +106,6 @@ export function getAggregate(searchParams: URLSearchParams) {
 
     // alias needed for subqueries so we include it all the time
     query += ` AS s`;
-
-    // JOIN block table using alias
-    query += ` JOIN blocks ON blocks.block_id = s.block_id`;
 
     const where = [];
     // Clickhouse Operators
@@ -129,6 +130,7 @@ export function getAggregate(searchParams: URLSearchParams) {
     if (collection_name) where.push(`collection_name == '${collection_name}'`);
     if (block_number) where.push(`block_number == '${block_number}'`);
     if (timestamp) where.push(`toUnixTimestamp(timestamp) == ${timestamp}`);
+    if (listing_price_symcode) where.push(`listing_price_symcode == '${listing_price_symcode}'`);
 
     // Join WHERE statements with AND
     if ( where.length ) query += ` WHERE (${where.join(' AND ')})`;
