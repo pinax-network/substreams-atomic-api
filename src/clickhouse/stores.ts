@@ -2,6 +2,7 @@ import client from "./createClient.js";
 
 class ClickhouseStore {
   private collectionNamesPromise: Promise<string[]> | null = null;
+  private SymbolCodesPromise: Promise<string[]> | null = null;
 
   public get collection_names() {
     if (!this.collectionNamesPromise) {
@@ -13,6 +14,18 @@ class ClickhouseStore {
     }
 
     return this.collectionNamesPromise;
+  }
+
+  public get symbol_codes() {
+    if (!this.SymbolCodesPromise) {
+      this.SymbolCodesPromise = client
+        .query({ query: "SELECT DISTINCT listing_price_symcode FROM Sales", format: "JSONEachRow" })
+        .then((response) => response.json<Array<{ listing_price_symcode: string }>>())
+        .then((symbol_codes) => symbol_codes.map(({ listing_price_symcode }) => listing_price_symcode))
+        .catch(() => []);
+    }
+
+    return this.SymbolCodesPromise;
   }
 }
 

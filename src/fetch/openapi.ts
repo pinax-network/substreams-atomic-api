@@ -88,10 +88,10 @@ export default new OpenApiBuilder()
         },
         {
           name: "listing_price_symcode",
-          description: "Filter by listing price symcode (ex: 'EOS')",
+          description: "Filter by Symbol Code",
           in: "query",
           required: false,
-          schema: { type: "string" },
+          schema: { enum: await store.symbol_codes },
         },
         {
           name: "trx_id",
@@ -182,6 +182,13 @@ export default new OpenApiBuilder()
           description: "Filter by collection name",
           required: false,
           schema: {enum: await store.collection_names},
+        },
+        {
+          name: "listing_price_symcode",
+          description: "Filter by Symbol Code",
+          in: "query",
+          required: false,
+          schema: { enum: await store.symbol_codes },
         },
         {
           name: 'timestamp',
