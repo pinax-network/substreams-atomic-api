@@ -37,12 +37,29 @@ export default new OpenApiBuilder()
   })
   .addExternalDocs({ url: pkg.homepage, description: "Extra documentation" })
   .addSecurityScheme("auth-key", { type: "http", scheme: "bearer" })
+  .addPath("/chains", {
+    get: {
+      tags: [TAGS.USAGE],
+      summary: "Get chains",
+      description: "Get available chains",
+      responses: {
+        200: { description: "Array of chains", content: { "application/json": { schema: { enum: await store.chains } } } },
+      },
+    },
+  })
   .addPath("/sales", {
     get: {
       tags: [TAGS.USAGE],
       summary: "Get sales",
-      description: "Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `contains_asset_id`",
+      description: "Get sales by `chain`, `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `contains_asset_id`",
       parameters: [
+        {
+          name: "chain",
+          in: "query",
+          description: "Filter by chain name",
+          required: false,
+          schema: {enum: await store.chains},
+        },
         {
           name: "collection_name",
           in: "query",
@@ -160,7 +177,7 @@ export default new OpenApiBuilder()
     get: {
       tags: [TAGS.USAGE],
       summary: "Get aggregate of sales",
-      description: "Get aggregate of sales filtered by `collection_name`, `timestamp` or `block_number`",
+      description: "Get aggregate of sales filtered by `chain`,`collection_name`, `listing_price_symcode`, `timestamp` or `block_number`",
       parameters: [
         {
           name: "aggregate_function",
@@ -175,6 +192,13 @@ export default new OpenApiBuilder()
           description: "Aggregate column",
           required: false,
           schema: {enum: ['listing_price_amount', 'sale_id', 'total_asset_ids'] },
+        },
+        {
+          name: "chain",
+          in: "query",
+          description: "Filter by chain name",
+          required: false,
+          schema: {enum: await store.chains},
         },
         {
           name: "collection_name",

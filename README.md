@@ -6,8 +6,9 @@
 | <div style="width:200px">Pathname</div>| Description           |
 |----------------------------------------|-----------------------|
 | GET `/health`                          | Health check
-| GET `/sales`                           | Get sales by `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `contains_asset_id`
-| GET `/sales/aggregate`                 | Get aggregate of sales filtered by `collection_name`, `timestamp` or `block_number`
+| GET `/chains`                          | Get available chains
+| GET `/sales`                           | Get sales by `chain`, `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `contains_asset_id`
+| GET `/sales/aggregate`                 | Get aggregate of sales filtered by `chain`,`collection_name`, `listing_price_symcode`, `timestamp` or `block_number`
 | GET `/metrics`                         | Prometheus metrics
 | GET `/openapi`                         | [OpenAPI v3 JSON](https://spec.openapis.org/oas/v3.0.0)
 

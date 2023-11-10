@@ -1,6 +1,7 @@
 import { registry } from "../prometheus.js";
 import openapi from "./openapi.js";
 import health from "./health.js";
+import chains from "./chains.js";
 import sales from "./sales.js";
 import aggregate from "./aggregate.js";
 import * as prometheus from "../prometheus.js";
@@ -17,6 +18,7 @@ export default async function (req: Request) {
     if ( pathname === "/health" ) return health(req);
     if ( pathname === "/metrics" ) return toText(await registry.metrics());
     if ( pathname === "/openapi" ) return toJSON(openapi);
+    if ( pathname === "/chains" ) return chains();
     if ( pathname === "/sales" ) return sales(req);
     if ( pathname === "/sales/aggregate" ) return aggregate(req);
     logger.warn(`Not found: ${pathname}`);

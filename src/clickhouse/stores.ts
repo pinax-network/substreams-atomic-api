@@ -3,6 +3,7 @@ import client from "./createClient.js";
 class ClickhouseStore {
   private collectionNamesPromise: Promise<string[]> | null = null;
   private SymbolCodesPromise: Promise<string[]> | null = null;
+  private ChainsPromise: Promise<string[]> | null = null;
 
   public get collection_names() {
     if (!this.collectionNamesPromise) {
@@ -26,6 +27,18 @@ class ClickhouseStore {
     }
 
     return this.SymbolCodesPromise;
+  }
+  
+  public get chains() {
+    if (!this.ChainsPromise) {
+      this.ChainsPromise = client
+        .query({ query: "SELECT DISTINCT chain FROM Sales", format: "JSONEachRow" })
+        .then((response) => response.json<Array<{ chain: string }>>())
+        .then((chains) => chains.map(({ chain }) => chain))
+        .catch(() => []);
+    }
+
+    return this.ChainsPromise;
   }
 }
 
