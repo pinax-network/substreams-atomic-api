@@ -1,5 +1,6 @@
 # [`Substreams`](https://substreams.streamingfast.io/) Atomic API
 [![.github/workflows/bun-test.yml](https://github.com/pinax-network/substreams-atomic-api/actions/workflows/bun-test.yml/badge.svg)](https://github.com/pinax-network/substreams-atomic-api/actions/workflows/bun-test.yml)
+![License](https://img.shields.io/github/license/pinax-network/substreams-atomic-api)
 
 ## REST API
 

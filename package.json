@@ -3,6 +3,7 @@
   "description": "Atomic API",
   "version": "v0.2.0",
   "homepage": "https://github.com/pinax-network/substreams-atomic-api",
+  "license": "MIT",
   "type": "module",
   "author": {
     "name": "Paul Meignan",
