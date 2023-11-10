@@ -2,6 +2,9 @@ import { z } from 'zod';
 import { Name, Asset } from "@wharfkit/antelope";
 import { DEFAULT_SORT_BY, DEFAULT_AGGREGATE_FUNCTION, config } from "./config.js";
 import { logger } from './logger.js';
+import { store } from "./clickhouse/stores.js";
+import { toText } from './fetch/cors.js';
+
 
 export function parseCollectionName(collection_name?: string|null) {
     if (!z.string().regex(Name.pattern).safeParse(collection_name).success) {
@@ -9,6 +12,14 @@ export function parseCollectionName(collection_name?: string|null) {
     }
 
     return collection_name;
+}
+
+export function parseChain(chain?: string|null) {
+    if (!z.string().regex(/^[a-zA-Z0-9]+$/).safeParse(chain).success) {
+        return undefined;
+    }
+
+    return chain;
 }
 
 export function parsePositiveInt(number?: string|null|number) {
@@ -93,4 +104,32 @@ export function parseAggregateColumn(aggregate_column?: string|null) {
         return undefined;
     }
     return aggregate_column;
+}
+
+export async function verifyParameters(req: Request) {
+    const url = new URL(req.url);
+    const collection_name = url.searchParams.get("collection_name");
+    const symbol_code = url.searchParams.get("listing_price_symcode");
+    const chain = url.searchParams.get("chain");
+  
+    if (collection_name && (parseCollectionName(collection_name) == undefined)) {
+      return toText("Invalid EOSIO name type: collection_name=" + collection_name, 400);
+    }
+    else if (collection_name && !(await store.collection_names).includes(collection_name)) {
+      return toText("Collection not found: " + collection_name, 404);
+    }
+  
+    if (symbol_code && (parseListingPriceSymcode(symbol_code) == undefined)) {
+      return toText("Invalid EOSIO Symbol code: listing_price_symcode=" + symbol_code, 400);
+    }
+    else if (symbol_code && !(await store.symbol_codes).includes(symbol_code)) {
+      return toText("Symbol code not found: " + symbol_code, 404);
+    }
+  
+    if(chain && (parseChain(chain) == undefined)) {
+      return toText("Invalid chain name: chain=" + chain, 400);
+    }
+    else if (chain && !(await store.chains).includes(chain)) {
+      return toText("Chain not found: " + chain, 404);
+    }
 }

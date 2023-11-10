@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { parseCollectionName, parsePositiveInt, parseListingPriceSymcode, parseTransactionId,
+import { parseCollectionName, parseChain, parsePositiveInt, parseListingPriceSymcode, parseTransactionId,
      parseLimit, parseTimestamp, parseAggregateFunction, parseAggregateColumn } from "./utils.js";
 import { DEFAULT_MAX_LIMIT } from "./config.js";
 
@@ -8,6 +8,13 @@ test("parseCollectionName", () => {
     expect(parseCollectionName(null)).toBeUndefined();
     expect(parseCollectionName("pomelo")).toBe("pomelo");
     expect(parseCollectionName("222wombat222")).toBe("222wombat222");
+});
+
+test("parseChain", () => {
+    expect(parseChain()).toBeUndefined();
+    expect(parseChain(null)).toBeUndefined();
+    expect(parseChain("eos")).toBe("eos");
+    expect(parseChain("wax")).toBe("wax");
 });
 
 test("parsePositiveInt", () => {
