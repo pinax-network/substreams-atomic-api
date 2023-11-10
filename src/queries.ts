@@ -1,22 +1,25 @@
 import { DEFAULT_SORT_BY, config } from './config.js';
-import { parseCollectionName, parseTimestamp, parsePositiveInt, parseListingPriceSymcode,
+import { parseCollectionName, parseChain, parseTimestamp, parsePositiveInt, parseListingPriceSymcode,
      parseTransactionId, parseLimit, parseSortBy, parseAggregateFunction, parseAggregateColumn } from './utils.js';
 
 export interface Sale {
-    collection_name: string,
     sale_id: number,
-    timestamp: string,
-    block_number: number,
-    listing_price_amount: number,
-    listing_price_symcode: string,
     trx_id: string,
     asset_ids: number[],
+    listing_price_amount: number,
+    listing_price_precision: number,
+    listing_price_symcode: string,
+    collection_name: string,
+    template_id: number,
+    block_number: number,
+    timestamp: string,
+    chain: string
 }
 
 export function getSale(searchParams: URLSearchParams) {
     // SQL Query
     let query = `SELECT sale_id, trx_id, asset_ids, listing_price_amount, listing_price_precision, listing_price_symcode,
-s.collection_name as collection_name, template_id, block_number, timestamp FROM`;
+s.collection_name as collection_name, template_id, block_number, timestamp, s.chain as chain FROM`;
     
     // explode asset_ids array (useful for bundle sales)
     query += ` (SELECT * FROM Sales ARRAY JOIN asset_ids) AS s`;
@@ -48,21 +51,31 @@ s.collection_name as collection_name, template_id, block_number, timestamp FROM`
 
     // equals
     const collection_name = parseCollectionName(searchParams.get('collection_name'));
-    const sale_id = parsePositiveInt(searchParams.get('sale_id'));
-    const block_number = parsePositiveInt(searchParams.get('block_number'));
-    const timestamp = parseTimestamp(searchParams.get('timestamp'));
-    const listing_price_amount = parsePositiveInt(searchParams.get('listing_price_amount'));
-    const listing_price_symcode = parseListingPriceSymcode(searchParams.get('listing_price_symcode'));
-    const trx_id = parseTransactionId(searchParams.get('trx_id'));
-    const template_id = parsePositiveInt(searchParams.get('template_id'));
     if (collection_name) where.push(`collection_name == '${collection_name}'`);
+
+    const sale_id = parsePositiveInt(searchParams.get('sale_id'));
     if (sale_id) where.push(`sale_id == '${sale_id}'`);
+
+    const block_number = parsePositiveInt(searchParams.get('block_number'));
     if (block_number) where.push(`block_number == '${block_number}'`);
+
+    const timestamp = parseTimestamp(searchParams.get('timestamp'));
     if (timestamp) where.push(`toUnixTimestamp(timestamp) == ${timestamp}`);
+
+    const listing_price_amount = parsePositiveInt(searchParams.get('listing_price_amount'));
     if (listing_price_amount) where.push(`listing_price_amount == ${listing_price_amount}`);
+
+    const listing_price_symcode = parseListingPriceSymcode(searchParams.get('listing_price_symcode'));
     if (listing_price_symcode) where.push(`listing_price_symcode == '${listing_price_symcode}'`);
+
+    const trx_id = parseTransactionId(searchParams.get('trx_id'));
     if (trx_id) where.push(`trx_id == '${trx_id}'`);
+
+    const template_id = parsePositiveInt(searchParams.get('template_id'));
     if (template_id) where.push(`template_id == '${template_id}'`);
+
+    const chain = parseChain(searchParams.get('chain'));
+    if (chain) where.push(`chain == '${chain}'`);
 
     // Join WHERE statements with AND
     if ( where.length ) query += ` WHERE (${where.join(' AND ')})`;
@@ -125,12 +138,18 @@ export function getAggregate(searchParams: URLSearchParams) {
 
     // equals
     const collection_name = parseCollectionName(searchParams.get('collection_name'));
-    const block_number = parsePositiveInt(searchParams.get('block_number'));
-    const timestamp = parseTimestamp(searchParams.get('timestamp'));
     if (collection_name) where.push(`collection_name == '${collection_name}'`);
+
+    const block_number = parsePositiveInt(searchParams.get('block_number'));
     if (block_number) where.push(`block_number == '${block_number}'`);
+
+    const timestamp = parseTimestamp(searchParams.get('timestamp'));
     if (timestamp) where.push(`toUnixTimestamp(timestamp) == ${timestamp}`);
+
     if (listing_price_symcode) where.push(`listing_price_symcode == '${listing_price_symcode}'`);
+
+    const chain = parseChain(searchParams.get('chain'));
+    if (chain) where.push(`chain == '${chain}'`);
 
     // Join WHERE statements with AND
     if ( where.length ) query += ` WHERE (${where.join(' AND ')})`;
