@@ -74,7 +74,7 @@ test("parseTimestamp", () => {
 test("parseAggregateFunction", () => {
     expect(parseAggregateFunction()).toBe("count");
     expect(parseAggregateFunction(null)).toBe("count");
-    expect(parseAggregateFunction("invalid")).toBe("count");
+    expect(parseAggregateFunction("invalid")).toBeUndefined();
     expect(parseAggregateFunction("count")).toBe("count");
     expect(parseAggregateFunction("sum")).toBe("sum");
     expect(parseAggregateFunction("avg")).toBe("avg");
