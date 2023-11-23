@@ -68,26 +68,28 @@ erDiagram
     Sales }|--|{ Assets : " "
 
     Sales {
-        sale_id     UInt64,
-        trx_id      String,
-        seller      String,
-        asset_ids   Array(UInt64),
-        offer_id    Int64,
-        listing_price_amount  Int64,
-        listing_price_precision  UInt8,
-        listing_price_symcode    String,
-        settlement_symbol_precision   UInt8,
-        settlement_symbol_code String,
-        maker_marketplace String,
-        collection_name String,
-        collection_fee  Float64,
+        sale_id     UInt64
+        trx_id      String
+        seller      String
+        asset_ids   Array(UInt64)
+        offer_id    Int64
+        listing_price_amount  Int64
+        listing_price_precision  UInt8
+        listing_price_symcode    String
+        settlement_symbol_precision   UInt8
+        settlement_symbol_code String
+        maker_marketplace String
+        collection_name String
+        collection_fee  Float64
+
     }
 
     Assets {
         asset_id     UInt64
-        owner        String
+        scope        String
         collection_name String
         template_id  Int32
+
     }
 ```
 ## Help
