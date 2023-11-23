@@ -32,7 +32,7 @@ class ClickhouseStore {
   public get chains() {
     if (!this.ChainsPromise) {
       this.ChainsPromise = client
-        .query({ query: "SELECT DISTINCT chain FROM Sales", format: "JSONEachRow" })
+        .query({ query: "SELECT DISTINCT chain FROM module_hashes", format: "JSONEachRow" })
         .then((response) => response.json<Array<{ chain: string }>>())
         .then((chains) => chains.map(({ chain }) => chain))
         .catch(() => []);
