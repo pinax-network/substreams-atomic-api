@@ -215,39 +215,12 @@ export default new OpenApiBuilder()
           schema: { enum: await store.symbol_codes },
         },
         {
-          name: 'timestamp',
-          in: 'query',
-          description: 'Filter by exact timestamp',
-          required: false,
-          schema: timestampSchema,
-          examples: timestampExamples,
-        },
-        {
-          name: "block_number",
-          description: "Filter by Block number (ex: 18399498)",
+          name: "range",
           in: "query",
+          description: "Time range to query (ex: 24h)",
           required: false,
-          schema: { type: "number" },
-        },
-        ...["greater_or_equals_by_timestamp", "greater_by_timestamp", "less_or_equals_by_timestamp", "less_by_timestamp"].map(name => {
-          return {
-            name,
-            in: "query",
-            description: "Filter " + name.replace(/_/g, " "),
-            required: false,
-            schema: timestampSchema,
-            examples: timestampExamples,
-          } as ParameterObject
-        }),
-        ...["greater_or_equals_by_block_number", "greater_by_block_number", "less_or_equals_by_block_number", "less_by_block_number"].map(name => {
-          return {
-            name,
-            in: "query",
-            description: "Filter " + name.replace(/_/g, " "),
-            required: false,
-            schema: { type: "number" },
-          } as ParameterObject
-        }),
+          schema: { enum: ["24h", "7d", "30d", "90d", "1y", "all"] },
+        }
       ],
       responses: {
         200: { description: "Aggregate of sales", content: { "text/plain": { example: aggregate_example} } },

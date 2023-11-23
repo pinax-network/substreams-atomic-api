@@ -9,7 +9,7 @@
 | GET `/health`                          | Health check
 | GET `/chains`                          | Get available chains
 | GET `/sales`                           | Get sales by `chain`, `collection_name`, `sale_id`, `timestamp`, `block_number`, `template_id`, `listing_price_amount`, `listing_price_symcode`, `trx_id` or `contains_asset_id`
-| GET `/sales/aggregate`                 | Get aggregate of sales filtered by `chain`,`collection_name`, `listing_price_symcode`, `timestamp` or `block_number`
+| GET `/sales/aggregate`                 | Get aggregate of sales for given time range filtered by `chain`,`collection_name` or `listing_price_symcode`
 | GET `/metrics`                         | Prometheus metrics
 | GET `/openapi`                         | [OpenAPI v3 JSON](https://spec.openapis.org/oas/v3.0.0)
 
@@ -56,34 +56,38 @@ MAX_LIMIT=500
 # Logging
 VERBOSE=true
 ```
-## Expected database structure
+## Required database structure
 `substreams-sink-clickhouse` auto generates some tables (see [Database structure](https://github.com/pinax-network/substreams-sink-clickhouse#database-structure) section).
 For this API to work, you will also need to provide following schemas to `substreams-sink-clickhouse` (see [Schema initialization](https://github.com/pinax-network/substreams-sink-clickhouse#schema-initialization) section):
 - `substreams-atomicmarket-sales` [schema](https://github.com/pinax-network/substreams-atomicmarket-sales/blob/master/schema.sql)
 - `substreams-atomicassets` [schema](https://github.com/pinax-network/substreams-atomicassets/blob/master/schema.sql)
   
-The expected added tables to the database structure will then be:
+The minimum required added tables to the database structure are:
 ```mermaid
 erDiagram
     Sales }|--|{ Assets : " "
 
     Sales {
-        sale_id     UInt64
-        trx_id      String
-        asset_ids   Array(UInt64)
-        listing_price_amount  Int64
-        listing_price_precision  UInt8
-        listing_price_symcode    String
-        collection_name String
-
+        sale_id     UInt64,
+        trx_id      String,
+        seller      String,
+        asset_ids   Array(UInt64),
+        offer_id    Int64,
+        listing_price_amount  Int64,
+        listing_price_precision  UInt8,
+        listing_price_symcode    String,
+        settlement_symbol_precision   UInt8,
+        settlement_symbol_code String,
+        maker_marketplace String,
+        collection_name String,
+        collection_fee  Float64,
     }
 
     Assets {
         asset_id     UInt64
-        scope        String
+        owner        String
         collection_name String
         template_id  Int32
-
     }
 ```
 ## Help
