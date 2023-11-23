@@ -1,7 +1,7 @@
 {
   "name": "substreams-atomic-api",
   "description": "Atomic API",
-  "version": "v0.2.1",
+  "version": "v0.2.2",
   "homepage": "https://github.com/pinax-network/substreams-atomic-api",
   "license": "MIT",
   "type": "module",
