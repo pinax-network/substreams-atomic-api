@@ -15,6 +15,7 @@ export const DEFAULT_VERBOSE = true;
 export const APP_NAME = pkg.name;
 export const DEFAULT_SORT_BY = "DESC";
 export const DEFAULT_AGGREGATE_FUNCTION = "count";
+export const DEFAULT_AGGREGATE_COLUMN = "sale_id";
 
 // parse command line options
 const opts = program

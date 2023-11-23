@@ -22,7 +22,7 @@ test("getAggregate", () => {
     const date_of_query = Math.floor(Number(new Date().setHours(0,0,0,0)) / 1000);
     const datetime_of_query = Math.floor(Number(new Date()) / 1000);
     expect(getAggregate(new URLSearchParams({aggregate_function: 'count', collection_name})))
-        .toBe(`SELECT chain, listing_price_symcode as symbol_code, toUnixTimestamp(DATE(timestamp)) as timestamp, count() as value FROM Sales AS s WHERE (timestamp BETWEEN ${datetime_of_query} - 3600 * 24 AND ${datetime_of_query} AND collection_name == 'pomelo') GROUP BY chain, symbol_code, timestamp order by timestamp ASC`);
+        .toBe(`SELECT chain, listing_price_symcode as symbol_code, toUnixTimestamp(DATE(timestamp)) as timestamp, count(sale_id) as value FROM Sales AS s WHERE (timestamp BETWEEN ${datetime_of_query} - 3600 * 24 AND ${datetime_of_query} AND collection_name == 'pomelo') GROUP BY chain, symbol_code, timestamp order by timestamp ASC`);
 
 
     expect(getAggregate(new URLSearchParams({aggregate_function: 'max', aggregate_column: 'listing_price_amount', range: '30d'})))

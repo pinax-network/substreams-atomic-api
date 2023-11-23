@@ -83,8 +83,8 @@ test("parseAggregateFunction", () => {
 });
 
 test("parseAggregateColumn", () => {
-    expect(parseAggregateColumn()).toBeUndefined();
-    expect(parseAggregateColumn(null)).toBeUndefined();
+    expect(parseAggregateColumn()).toBe("sale_id");
+    expect(parseAggregateColumn(null)).toBe("sale_id");
     expect(parseAggregateColumn("invalid")).toBeUndefined();
     expect(parseAggregateColumn("sale_id")).toBe("sale_id");
     expect(parseAggregateColumn("listing_price_amount")).toBe("listing_price_amount");

@@ -116,7 +116,7 @@ export function getAggregate(searchParams: URLSearchParams) {
     // for total asset ids we need a subquery
     else if (aggregate_column == "total_asset_ids") query += ` ${aggregate_function}(${aggregate_column}) as value FROM (SELECT chain, collection_name, listing_price_symcode, timestamp, block_number, length(asset_ids) AS total_asset_ids`;
     else if (aggregate_column == "listing_price_amount") query += ` ${aggregate_function}(${aggregate_column}) as value`
-    else throw new Error("Invalid aggregate column with given aggregate function");
+    else throw new Error("Invalid aggregate column with given aggregate function"); // should never happen because checked in verifyParameters
 
     query += ` FROM Sales`;
 

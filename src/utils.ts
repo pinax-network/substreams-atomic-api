@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { Name, Asset } from "@wharfkit/antelope";
-import { DEFAULT_SORT_BY, DEFAULT_AGGREGATE_FUNCTION, config } from "./config.js";
-import { logger } from './logger.js';
+import { DEFAULT_SORT_BY, DEFAULT_AGGREGATE_FUNCTION, DEFAULT_AGGREGATE_COLUMN, config } from "./config.js";
 import { store } from "./clickhouse/stores.js";
 import { toText } from './fetch/cors.js';
 import { SalesHistoryData } from './queries.js';
@@ -109,7 +108,9 @@ export function parseAggregateFunction(aggregate_function?: string|null) {
     return aggregate_function;
 }
 
+// same logic as above
 export function parseAggregateColumn(aggregate_column?: string|null) {
+    if(!aggregate_column) return DEFAULT_AGGREGATE_COLUMN;
     if (!z.enum(["sale_id", "total_asset_ids", "listing_price_amount", "listing_price_value"]).safeParse(aggregate_column).success) {
         return undefined;
     }
@@ -166,6 +167,17 @@ export async function verifyParameters(req: Request) {
     const aggregate_function = url.searchParams.get("aggregate_function");
     if(aggregate_function && (parseAggregateFunction(aggregate_function) == undefined)) {
         return toText("Invalid aggregate function: " + aggregate_function, 400);
+    }
+
+    // aggregate_column (valid)
+    const aggregate_column = url.searchParams.get("aggregate_column");
+    if(aggregate_column && (parseAggregateColumn(aggregate_column) == undefined)) {
+        return toText("Invalid aggregate column: " + aggregate_column, 400);
+    }
+
+    // check for invalid combinations (numeric aggregation on sale_id)
+    if(aggregate_function && aggregate_function != "count" && aggregate_column == "sale_id") {
+        return toText("Invalid aggregate column: " + aggregate_column + " for aggregate function: " + aggregate_function, 400);
     }
 }
 
