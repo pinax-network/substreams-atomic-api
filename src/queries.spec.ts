@@ -19,15 +19,15 @@ JOIN Assets AS a ON a.asset_id = s.asset_ids AND a.collection_name = s.collectio
 });
 
 test("getAggregate", () => {
+    const date_of_query = Math.floor(Number(new Date().setHours(0,0,0,0)) / 1000);
+    const datetime_of_query = Math.floor(Number(new Date()) / 1000);
     expect(getAggregate(new URLSearchParams({aggregate_function: 'count', collection_name})))
-        .toBe(`SELECT count() FROM Sales AS s WHERE (collection_name == '${collection_name}')`);
+        .toBe(`SELECT chain, listing_price_symcode as symbol_code, toUnixTimestamp(DATE(timestamp)) as timestamp, count() as value FROM Sales AS s WHERE (timestamp BETWEEN ${datetime_of_query} - 3600 * 24 AND ${datetime_of_query} AND collection_name == 'pomelo') GROUP BY chain, symbol_code, timestamp order by timestamp ASC`);
 
-    expect(getAggregate(new URLSearchParams({aggregate_function: 'count', aggregate_column: 'sale_id'})))
-        .toBe(`SELECT count(sale_id) FROM Sales AS s`);
 
-    expect(getAggregate(new URLSearchParams({aggregate_function: 'max', aggregate_column: 'listing_price_amount', listing_price_symcode: 'EOS'})))
-        .toBe(`SELECT max(listing_price_amount) FROM Sales AS s WHERE (listing_price_symcode == 'EOS')`);
+    expect(getAggregate(new URLSearchParams({aggregate_function: 'max', aggregate_column: 'listing_price_amount', range: '30d'})))
+        .toBe(`SELECT chain, listing_price_symcode as symbol_code, toUnixTimestamp(DATE(timestamp)) as timestamp, max(listing_price_amount) as value FROM Sales AS s WHERE (timestamp BETWEEN ${date_of_query} - 86400 * 30 AND ${date_of_query}) GROUP BY chain, symbol_code, timestamp order by timestamp ASC`);
     
-    expect(getAggregate(new URLSearchParams({aggregate_function: 'max', aggregate_column: 'total_asset_ids'})))
-        .toBe(`SELECT max(total_asset_ids) FROM (SELECT length(asset_ids) AS total_asset_ids FROM Sales) AS s`);
+    expect(getAggregate(new URLSearchParams({aggregate_function: 'avg', aggregate_column: 'total_asset_ids'})))
+        .toBe(`SELECT chain, listing_price_symcode as symbol_code, toUnixTimestamp(DATE(timestamp)) as timestamp, avg(total_asset_ids) as value FROM (SELECT chain, collection_name, listing_price_symcode, timestamp, block_number, length(asset_ids) AS total_asset_ids FROM Sales) AS s WHERE (timestamp BETWEEN ${datetime_of_query} - 3600 * 24 AND ${datetime_of_query}) GROUP BY chain, symbol_code, timestamp order by timestamp ASC`);
 });

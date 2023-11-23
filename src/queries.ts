@@ -1,6 +1,6 @@
 import { DEFAULT_SORT_BY, config } from './config.js';
 import { parseCollectionName, parseChain, parseTimestamp, parsePositiveInt, parseListingPriceSymcode,
-     parseTransactionId, parseLimit, parseSortBy, parseAggregateFunction, parseAggregateColumn } from './utils.js';
+     parseTransactionId, parseLimit, parseSortBy, parseAggregateFunction, parseAggregateColumn, parseHistoryRange } from './utils.js';
 
 export interface Sale {
     sale_id: number,
@@ -14,6 +14,13 @@ export interface Sale {
     block_number: number,
     timestamp: string,
     chain: string
+}
+
+export interface SalesHistoryData {
+    chain: string;
+    symbol_code: string;
+    value: number;
+    timestamp: number;
 }
 
 export function getSale(searchParams: URLSearchParams) {
@@ -90,7 +97,7 @@ s.collection_name as collection_name, template_id, block_number, timestamp, s.ch
 
 export function getAggregate(searchParams: URLSearchParams) {
     // SQL Query
-    let query = `SELECT`;
+    let query = `SELECT chain, listing_price_symcode as symbol_code, toUnixTimestamp(DATE(timestamp)) as timestamp,`;
 
     // Aggregate Function
     const aggregate_function = parseAggregateFunction(searchParams.get("aggregate_function"));
@@ -102,14 +109,13 @@ export function getAggregate(searchParams: URLSearchParams) {
     const listing_price_symcode = parseListingPriceSymcode(searchParams.get('listing_price_symcode'));
 
     if (aggregate_function == "count"  && aggregate_column != "total_asset_ids")  {
-        if (aggregate_column) query += ` count(${aggregate_column})`;
-        else query += ` count()`;
+        if (aggregate_column) query += ` count(${aggregate_column}) as value`;
+        else query += ` count() as value`;
     }
 
     // for total asset ids we need a subquery
-    else if (aggregate_column == "total_asset_ids") query += ` ${aggregate_function}(${aggregate_column}) FROM (SELECT length(asset_ids) AS total_asset_ids`;
-    else if (aggregate_column == "listing_price_amount" &&  (listing_price_symcode)) query += ` ${aggregate_function}(${aggregate_column})`
-    else if (aggregate_column == "listing_price_amount" &&  !(listing_price_symcode)) throw new Error("Please specify a Symbol Code");
+    else if (aggregate_column == "total_asset_ids") query += ` ${aggregate_function}(${aggregate_column}) as value FROM (SELECT chain, collection_name, listing_price_symcode, timestamp, block_number, length(asset_ids) AS total_asset_ids`;
+    else if (aggregate_column == "listing_price_amount") query += ` ${aggregate_function}(${aggregate_column}) as value`
     else throw new Error("Invalid aggregate column with given aggregate function");
 
     query += ` FROM Sales`;
@@ -121,30 +127,30 @@ export function getAggregate(searchParams: URLSearchParams) {
     query += ` AS s`;
 
     const where = [];
-    // Clickhouse Operators
-    // https://clickhouse.com/docs/en/sql-reference/operators
-    const operators = [
-        ["greater_or_equals", ">="],
-        ["greater", ">"],
-        ["less_or_equals", "<="],
-        ["less", "<"],
-    ]
-    for ( const [key, operator] of operators ) {
-        const block_number = parsePositiveInt(searchParams.get(`${key}_by_block_number`));
-        const timestamp = parseTimestamp(searchParams.get(`${key}_by_timestamp`));
-        if (block_number) where.push(`block_number ${operator} ${block_number}`);
-        if (timestamp) where.push(`toUnixTimestamp(timestamp) ${operator} ${timestamp}`);
+
+    // Time range from time of query
+    const datetime_of_query = Math.floor(Number(new Date()) / 1000);
+    const date_of_query = Math.floor(Number(new Date().setHours(0,0,0,0)) / 1000);
+    const range = parseHistoryRange(searchParams.get('range'));
+
+    if (range?.includes('h')) {
+        const hours = parseInt(range);
+        if (hours) where.push(`timestamp BETWEEN ${datetime_of_query} - 3600 * ${hours} AND ${datetime_of_query}`);
+    }
+
+    if (range?.includes('d')) {
+        const days = parseInt(range);
+        if (days) where.push(`timestamp BETWEEN ${date_of_query} - 86400 * ${days} AND ${date_of_query}`);
+    }
+
+    if(range?.includes('y')) {
+        const years = parseInt(range);
+        if (years) where.push(`timestamp BETWEEN ${date_of_query} - 31536000 * ${years} AND ${date_of_query}`);
     }
 
     // equals
     const collection_name = parseCollectionName(searchParams.get('collection_name'));
     if (collection_name) where.push(`collection_name == '${collection_name}'`);
-
-    const block_number = parsePositiveInt(searchParams.get('block_number'));
-    if (block_number) where.push(`block_number == '${block_number}'`);
-
-    const timestamp = parseTimestamp(searchParams.get('timestamp'));
-    if (timestamp) where.push(`toUnixTimestamp(timestamp) == ${timestamp}`);
 
     if (listing_price_symcode) where.push(`listing_price_symcode == '${listing_price_symcode}'`);
 
@@ -153,6 +159,8 @@ export function getAggregate(searchParams: URLSearchParams) {
 
     // Join WHERE statements with AND
     if ( where.length ) query += ` WHERE (${where.join(' AND ')})`;
+
+    query += ` GROUP BY chain, symbol_code, timestamp order by timestamp ASC`;
 
     return query;
 }
